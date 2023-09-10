@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="EHf-IW-A2E">
+            <objects>
+                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Home" translatesAutoresizingMaskIntoConstraints="NO" id="eFI-Mg-7kc">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Logo" translatesAutoresizingMaskIntoConstraints="NO" id="R1A-W8-zUs">
+                                <rect key="frame" x="132" y="326" width="151" height="181"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="R1A-W8-zUs" secondAttribute="height" multiplier="151:181" id="JRI-PU-rsd"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="eFI-Mg-7kc" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="9aj-KK-sYr"/>
+                            <constraint firstItem="R1A-W8-zUs" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="282" id="HZy-nl-7Fq"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="R1A-W8-zUs" secondAttribute="bottom" constant="355" id="IOX-4C-mij"/>
+                            <constraint firstAttribute="bottom" secondItem="eFI-Mg-7kc" secondAttribute="bottom" id="YuQ-rM-2TH"/>
+                            <constraint firstItem="eFI-Mg-7kc" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="ZgF-Uo-hJR"/>
+                            <constraint firstItem="R1A-W8-zUs" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="132" id="dr2-V2-Qtg"/>
+                            <constraint firstItem="eFI-Mg-7kc" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="jbs-4N-Nq7"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="R1A-W8-zUs" secondAttribute="trailing" constant="131" id="mGs-Gw-TFE"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="52.173913043478265" y="375"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Home" width="750" height="1624"/>
+        <image name="Logo" width="128" height="148"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
