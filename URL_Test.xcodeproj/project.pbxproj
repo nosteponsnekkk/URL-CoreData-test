@@ -16,6 +16,10 @@
 		7C6590E32AAE3F2800CF9EFA /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7C6590E22AAE3F2800CF9EFA /* SnapKit */; };
 		7C6590E62AAE509300CF9EFA /* NewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590E52AAE509300CF9EFA /* NewsCell.swift */; };
 		7C6590E82AAE6D5A00CF9EFA /* Instruments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590E72AAE6D5A00CF9EFA /* Instruments.swift */; };
+		7C6590EB2AAF378C00CF9EFA /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590EA2AAF378B00CF9EFA /* MainTabBarController.swift */; };
+		7C6590EF2AAF431600CF9EFA /* DiscoverViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590EE2AAF431600CF9EFA /* DiscoverViewController.swift */; };
+		7C6590F12AAF432700CF9EFA /* SavedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590F02AAF432700CF9EFA /* SavedViewController.swift */; };
+		7C6590F32AAF433700CF9EFA /* UserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590F22AAF433700CF9EFA /* UserViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +33,10 @@
 		7C6590DF2AAE350300CF9EFA /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		7C6590E52AAE509300CF9EFA /* NewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCell.swift; sourceTree = "<group>"; };
 		7C6590E72AAE6D5A00CF9EFA /* Instruments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instruments.swift; sourceTree = "<group>"; };
+		7C6590EA2AAF378B00CF9EFA /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		7C6590EE2AAF431600CF9EFA /* DiscoverViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverViewController.swift; sourceTree = "<group>"; };
+		7C6590F02AAF432700CF9EFA /* SavedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedViewController.swift; sourceTree = "<group>"; };
+		7C6590F22AAF433700CF9EFA /* UserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +70,7 @@
 		7C6590C32AAE29BF00CF9EFA /* URL_Test */ = {
 			isa = PBXGroup;
 			children = (
+				7C6590E92AAF374600CF9EFA /* Controllers */,
 				7C6590E42AAE507100CF9EFA /* Views */,
 				7C6590DC2AAE31D900CF9EFA /* Delegates */,
 				7C6590DB2AAE31D400CF9EFA /* Tools */,
@@ -78,6 +87,9 @@
 			isa = PBXGroup;
 			children = (
 				7C6590DD2AAE332600CF9EFA /* HomeViewController.swift */,
+				7C6590EE2AAF431600CF9EFA /* DiscoverViewController.swift */,
+				7C6590F02AAF432700CF9EFA /* SavedViewController.swift */,
+				7C6590F22AAF433700CF9EFA /* UserViewController.swift */,
 			);
 			path = VC;
 			sourceTree = "<group>";
@@ -121,6 +133,14 @@
 				7C6590E52AAE509300CF9EFA /* NewsCell.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		7C6590E92AAF374600CF9EFA /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				7C6590EA2AAF378B00CF9EFA /* MainTabBarController.swift */,
+			);
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,9 +220,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C6590C52AAE29BF00CF9EFA /* AppDelegate.swift in Sources */,
+				7C6590F32AAF433700CF9EFA /* UserViewController.swift in Sources */,
 				7C6590C72AAE29BF00CF9EFA /* SceneDelegate.swift in Sources */,
 				7C6590DE2AAE332600CF9EFA /* HomeViewController.swift in Sources */,
+				7C6590F12AAF432700CF9EFA /* SavedViewController.swift in Sources */,
+				7C6590EB2AAF378C00CF9EFA /* MainTabBarController.swift in Sources */,
 				7C6590E02AAE350300CF9EFA /* Extensions.swift in Sources */,
+				7C6590EF2AAF431600CF9EFA /* DiscoverViewController.swift in Sources */,
 				7C6590E82AAE6D5A00CF9EFA /* Instruments.swift in Sources */,
 				7C6590E62AAE509300CF9EFA /* NewsCell.swift in Sources */,
 			);

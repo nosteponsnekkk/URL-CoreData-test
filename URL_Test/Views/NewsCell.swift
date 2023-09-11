@@ -9,10 +9,15 @@ import UIKit
 
 class NewsCell: UICollectionViewCell {
     
-    static let cellID = UUID().uuidString
+    //MARK: CELL ID
+    
+    public static let cellID = UUID().uuidString
+    
+    //MARK: Subviews
     
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .lightLightGray
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 20
@@ -30,19 +35,43 @@ class NewsCell: UICollectionViewCell {
         
         return activityIndicator
     }()
+    private lazy var titleLabel: UILabel = {
+        let titleLabel = UILabel()
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
+        titleLabel.textColor = .black
+        titleLabel.numberOfLines = 3
+        titleLabel.backgroundColor = .white
+        return titleLabel
+    }()
+    private lazy var dateLabel: UILabel = {
+        let dateLabel = UILabel()
+        dateLabel.textColor = .lightGray
+        dateLabel.backgroundColor = .white
+        dateLabel.font = UIFont.systemFont(ofSize: 18)
+        return dateLabel
+    }()
+    private lazy var authorLabel: UILabel = {
+        let authorLabel = UILabel()
+        authorLabel.textColor = .lightGray
+        authorLabel.backgroundColor = .white
+        authorLabel.font = UIFont.systemFont(ofSize: 18)
+        return authorLabel
+    }()
                     
+    //MARK: INITS
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupCell()
         makeConstraints()
     }
     
-    func setupCell(){
+    //MARK: Setting up methods
+    
+    private func setupCell(){
         
         backgroundColor = .white
         layer.cornerRadius = 25
@@ -56,11 +85,12 @@ class NewsCell: UICollectionViewCell {
         
         addSubview(imageView)
         imageView.addSubview(activityIndicator)
-
-
+        
+        addSubview(titleLabel)
+        addSubview(dateLabel)
+        addSubview(authorLabel)
     }
-    
-    func makeConstraints(){
+    private func makeConstraints(){
         imageView.snp.makeConstraints { make in
             make.top.left.right.equalTo(self).inset(15)
             make.height.equalTo(imageView.snp.width).dividedBy(1.8)
@@ -68,17 +98,40 @@ class NewsCell: UICollectionViewCell {
         activityIndicator.snp.makeConstraints { make in
             make.edges.equalTo(imageView)
         }
+        
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(imageView.snp_bottomMargin).offset(15)
+            make.left.right.equalTo(self).inset(15)
+        }
+        dateLabel.snp.makeConstraints { make in
+            make.left.equalTo(self).offset(15)
+            make.bottom.equalTo(self).offset(-30)
+        }
+        authorLabel.snp.makeConstraints { make in
+            make.right.equalTo(self).offset(-15)
+            make.bottom.equalTo(self).offset(-30)
+        }
     }
     
-    public func setContent(imageURL: String){
+    //MARK: Interface
+    
+    public func setContent(imageURL: String, title: String, timeStamp: String, author name: String){
         
+        dateLabel.text = "🕒 \(Date().timeAgoDisplay(timeStamp: timeStamp))"
+        
+        authorLabel.text = "by \(name)"
+        
+        titleLabel.text = title
         
         DispatchQueue.main.async { [unowned self] in
             urlToImage(url: imageURL) { image in
                 self.imageView.image = image
+                self.imageView.backgroundColor = .white
                 self.activityIndicator.removeFromSuperview()
             }
         }
+        
+        
         
     }
     

@@ -18,8 +18,32 @@ extension UIColor {
     static let sand = #colorLiteral(red: 0.937254902, green: 0.937254902, blue: 0.9215686275, alpha: 1)
 }
 
+extension Date {
+    func timeAgoDisplay(timeStamp: String) -> String{
 
-    
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        guard let date = dateFormatter.date(from: timeStamp) else {return "Some time ago..."}
+        
+        
+        let formatter = RelativeDateTimeFormatter()
+        formatter.locale = Locale(identifier: "en_GB")
+        
+        return formatter.localizedString(for: date, relativeTo: self)
+
+        
+    }
+}
+
+extension UIImage {
+    func resize(to size: CGSize) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+        defer { UIGraphicsEndImageContext() }
+        draw(in: CGRect(origin: .zero, size: size))
+        return UIGraphicsGetImageFromCurrentImageContext()
+    }
+}
   
     
 

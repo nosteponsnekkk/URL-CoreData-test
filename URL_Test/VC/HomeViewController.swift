@@ -66,7 +66,7 @@ class HomeViewController: UIViewController {
         let string = "Find Breaking News"
         let attributedString = NSAttributedString(string: string, attributes:
         [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
-        searchTextField.font = UIFont.systemFont(ofSize: 24)
+        searchTextField.font = UIFont.systemFont(ofSize: 20)
         searchTextField.attributedPlaceholder = attributedString
         searchTextField.backgroundColor = .transparentWhite
         searchTextField.clipsToBounds = true
@@ -144,7 +144,7 @@ class HomeViewController: UIViewController {
         }
         
         welcomeLabel.snp.makeConstraints { make in
-            make.top.equalTo(logoImageView.snp.bottom).offset(15)
+            make.top.equalTo(logoImageView.snp.bottom).offset(30)
             make.left.equalTo(logoImageView)
         }
         
@@ -154,14 +154,14 @@ class HomeViewController: UIViewController {
         }
         
         searchTextField.snp.makeConstraints { make in
-            make.top.equalTo(discoverLabel.snp.bottom).offset(15)
+            make.top.equalTo(discoverLabel.snp.bottom).offset(10)
             make.left.equalTo(discoverLabel)
             make.right.equalTo(margins).offset(-20)
             make.height.equalTo(searchTextField.snp.width).dividedBy(7)
         }
         
         breakingNewsLabel.snp.makeConstraints { make in
-            make.top.equalTo(searchTextField.snp.bottom).offset(20)
+            make.top.equalTo(searchTextField.snp.bottom).offset(30)
             make.left.equalTo(searchTextField)
         }
         
@@ -172,7 +172,7 @@ class HomeViewController: UIViewController {
         
         collectionView.snp.makeConstraints { make in
             make.left.right.equalTo(view)
-            make.top.equalTo(viewAllButton.snp_bottomMargin).offset(20)
+            make.top.equalTo(viewAllButton.snp_bottomMargin).offset(15)
             make.height.equalTo(350)
         }
         
@@ -201,7 +201,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsCell.cellID, for: indexPath) as! NewsCell
-        cell.setContent(imageURL: "https://a.fsdn.com/sd/topics/bitcoin_64.png")
+        cell.setContent(imageURL: "https://a.fsdn.com/sd/topics/bitcoin_64.png", title: "First Bitcoin ETF Could Be Coming Soon as Court Rules in Favor of Grayscale Over SEC", timeStamp: "2023-08-29T19:20:00Z", author: "Google News")
         return cell
     }
     
