@@ -9,11 +9,11 @@ import UIKit
 
 class NewsCell: UICollectionViewCell {
     
-    //MARK: CELL ID
+    //MARK: - CELL ID
     
     public static let cellID = UUID().uuidString
     
-    //MARK: Subviews
+    //MARK: - Subviews
     
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
@@ -54,11 +54,12 @@ class NewsCell: UICollectionViewCell {
         let authorLabel = UILabel()
         authorLabel.textColor = .lightGray
         authorLabel.backgroundColor = .white
+        authorLabel.numberOfLines = 1
         authorLabel.font = UIFont.systemFont(ofSize: 18)
         return authorLabel
     }()
                     
-    //MARK: INITS
+    //MARK: - INITS
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -69,7 +70,7 @@ class NewsCell: UICollectionViewCell {
         makeConstraints()
     }
     
-    //MARK: Setting up methods
+    //MARK: - Setting up methods
     
     private func setupCell(){
         
@@ -110,25 +111,32 @@ class NewsCell: UICollectionViewCell {
         authorLabel.snp.makeConstraints { make in
             make.right.equalTo(self).offset(-15)
             make.bottom.equalTo(self).offset(-30)
+            make.left.greaterThanOrEqualTo(dateLabel.snp_rightMargin).offset(25)
         }
     }
     
-    //MARK: Interface
+    //MARK: - Interface
     
-    public func setContent(imageURL: String, title: String, timeStamp: String, author name: String){
+    public func setContent(imageURL: String?, title: String?, timeStamp: String?, author name: String?){
+        if let timeStamp = timeStamp {
+            dateLabel.text = "🕒 \(Date().timeAgoDisplay(timeStamp: timeStamp))"
+        }
         
-        dateLabel.text = "🕒 \(Date().timeAgoDisplay(timeStamp: timeStamp))"
-        
-        authorLabel.text = "by \(name)"
+        authorLabel.text = "by \(name ?? "Unknown")"
         
         titleLabel.text = title
         
         DispatchQueue.main.async { [unowned self] in
-            urlToImage(url: imageURL) { image in
-                self.imageView.image = image
-                self.imageView.backgroundColor = .white
-                self.activityIndicator.removeFromSuperview()
+            if let imageURL = imageURL {
+                urlToImage(url: imageURL) { image in
+                    self.imageView.image = image
+                    self.imageView.backgroundColor = .white
+                    self.activityIndicator.removeFromSuperview()
+                }
+            } else {
+                self.imageView.image = UIImage(named: "noImageFound")
             }
+            
         }
         
         

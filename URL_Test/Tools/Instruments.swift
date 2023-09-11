@@ -8,6 +8,44 @@
 import Foundation
 import UIKit
 
+func composedURL(category: String, pageNumber: Int, resultsForPage: Int) -> String {
+    let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&apiKey=\(shared.APIKey)"
+    return url
+}
+
+
+func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> Void){
+    DispatchQueue.global(qos: .userInitiated).async {
+    let JSONDecoder = JSONDecoder()
+    let URLSession = URLSession(configuration: .default)
+        
+    guard let url = URL(string: string) else {return}
+    let urlRequest = URLRequest(url: url)
+                
+        URLSession.dataTask(with: urlRequest) { (data, response, error) in
+            if let error = error {
+                print("⚠️ URL Request Error:\(error.localizedDescription)")
+                return
+            } else if let data = data {
+                do {
+                    let jsonData = try JSONDecoder.decode(News.self, from: data)
+                    
+                    print("✅ Status:\(jsonData.status)")
+                    print("✅ Total Results:\(jsonData.totalResults)")
+                    
+                    DispatchQueue.main.async {
+                        completion(jsonData.articles)
+                    }
+                } catch  {
+                    print("⚠️ Decoding Error:\(error.localizedDescription)")
+                }
+            }
+            
+        }.resume()
+        
+    }
+}
+
 
 func urlToImage(url string: String, completion: @escaping (UIImage?) -> Void){
     DispatchQueue.global(qos: .userInitiated).async {

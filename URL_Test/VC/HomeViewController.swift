@@ -10,8 +10,21 @@ import SnapKit
 
 class HomeViewController: UIViewController {
     
-    //MARK: UI Elements
+    private var articles = [Article]()
     
+    //MARK: UI Elements
+    lazy private var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.contentSize = CGSize(width: view.frame.width, height: view.frame.height)
+        scrollView.contentInsetAdjustmentBehavior = .never
+        scrollView.showsVerticalScrollIndicator = false
+        return scrollView
+    }()
+    lazy private var contentView: UIView = {
+        let contentView = UIView()
+        contentView.frame.size = CGSize(width: view.frame.width, height: view.frame.height)
+        return contentView
+    }()
     lazy private var logoImageView: UIImageView = {
         let logoImageView = UIImageView(image: UIImage(named: "smallLogo"))
         logoImageView.contentMode = .scaleAspectFill
@@ -80,14 +93,14 @@ class HomeViewController: UIViewController {
         breakingNewsLabel.textColor = .white
         return breakingNewsLabel
     }()
-    lazy private var viewAllButton: UIButton = {
-        let viewAllButton = UIButton(type: .system)
-        viewAllButton.setTitle("View all", for: .normal)
-        viewAllButton.tintColor = .lightGray
-        viewAllButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        return viewAllButton
+    lazy private var viewAllNewsButton: UIButton = {
+        let viewAllNewsButton = UIButton(type: .system)
+        viewAllNewsButton.setTitle("View all", for: .normal)
+        viewAllNewsButton.tintColor = .lightGray
+        viewAllNewsButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        return viewAllNewsButton
     }()
-    lazy private var collectionView: UICollectionView = {
+    lazy private var breakingNewsCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 20
         layout.scrollDirection = .horizontal
@@ -97,6 +110,21 @@ class HomeViewController: UIViewController {
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
         return collectionView
     }()
+    lazy private var categoriesTitleLabel: UILabel = {
+        let categoriesTitleLabel = UILabel()
+        categoriesTitleLabel.text = "Category News"
+        categoriesTitleLabel.font = UIFont.boldSystemFont(ofSize: 20)
+        categoriesTitleLabel.textColor = .black
+        return categoriesTitleLabel
+    }()
+    lazy private var viewAllCategoriesButton: UIButton = {
+        let viewAllCategoriesButton = UIButton(type: .system)
+        viewAllCategoriesButton.setTitle("View all", for: .normal)
+        viewAllCategoriesButton.tintColor = .lightGray
+        viewAllCategoriesButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        return viewAllCategoriesButton
+    }()
+
     
 
     //MARK: ViewController Lifecycle
@@ -108,21 +136,46 @@ class HomeViewController: UIViewController {
         
         view.addSubview(logoImageView)
         view.addSubview(titleLabel)
-        view.addSubview(welcomeLabel)
-        view.addSubview(discoverLabel)
         
-        view.addSubview(searchTextField)
-        view.addSubview(breakingNewsLabel)
-        view.addSubview(viewAllButton)
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
         
-        view.addSubview(bottomColor)
-        view.addSubview(collectionView)
+        contentView.addSubview(welcomeLabel)
+        contentView.addSubview(discoverLabel)
         
+        contentView.addSubview(searchTextField)
+        
+        contentView.addSubview(breakingNewsLabel)
+        contentView.addSubview(viewAllNewsButton)
+        
+        contentView.addSubview(bottomColor)
+        
+        contentView.addSubview(breakingNewsCollectionView)
+        
+        contentView.addSubview(categoriesTitleLabel)
+        contentView.addSubview(viewAllCategoriesButton)
+                
         makeConstraints()
         
-        collectionView.register(NewsCell.self, forCellWithReuseIdentifier: NewsCell.cellID)
-        collectionView.delegate = self
-        collectionView.dataSource = self
+        breakingNewsCollectionView.register(NewsCell.self, forCellWithReuseIdentifier: NewsCell.cellID)
+        breakingNewsCollectionView.delegate = self
+        breakingNewsCollectionView.dataSource = self
+        
+        
+        DispatchQueue.main.async { [unowned self] in
+            parseNewsArticles(url: composedURL(category: "breaking", pageNumber: 1, resultsForPage: 10)) { articles in
+                self.articles = articles
+                UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
+                    self.breakingNewsCollectionView.snp.updateConstraints { make in
+                        make.height.equalTo(350)
+                    }
+                } completion: { _ in
+                    self.breakingNewsCollectionView.reloadData()
+                }
+
+            }
+        }
+        
     }
     
     //MARK: Other methods
@@ -143,20 +196,25 @@ class HomeViewController: UIViewController {
             make.centerY.equalTo(logoImageView)
         }
         
+        scrollView.snp.makeConstraints { make in
+            make.left.right.bottom.equalTo(view)
+            make.top.equalTo(titleLabel.snp_bottomMargin).offset(30)
+        }
+        
         welcomeLabel.snp.makeConstraints { make in
-            make.top.equalTo(logoImageView.snp.bottom).offset(30)
+            make.top.equalTo(contentView)
             make.left.equalTo(logoImageView)
         }
         
         discoverLabel.snp.makeConstraints { make in
             make.top.equalTo(welcomeLabel.snp.bottom).offset(5)
-            make.left.equalTo(welcomeLabel)
+            make.left.equalTo(contentView).offset(20)
         }
         
         searchTextField.snp.makeConstraints { make in
-            make.top.equalTo(discoverLabel.snp.bottom).offset(10)
+            make.top.equalTo(discoverLabel.snp.bottom).offset(30)
             make.left.equalTo(discoverLabel)
-            make.right.equalTo(margins).offset(-20)
+            make.right.equalTo(contentView).offset(-20)
             make.height.equalTo(searchTextField.snp.width).dividedBy(7)
         }
         
@@ -165,20 +223,30 @@ class HomeViewController: UIViewController {
             make.left.equalTo(searchTextField)
         }
         
-        viewAllButton.snp.makeConstraints { make in
+        viewAllNewsButton.snp.makeConstraints { make in
             make.centerY.equalTo(breakingNewsLabel)
             make.right.equalTo(searchTextField)
         }
         
-        collectionView.snp.makeConstraints { make in
-            make.left.right.equalTo(view)
-            make.top.equalTo(viewAllButton.snp_bottomMargin).offset(15)
-            make.height.equalTo(350)
+        breakingNewsCollectionView.snp.makeConstraints { make in
+            make.left.right.equalTo(contentView)
+            make.top.equalTo(viewAllNewsButton.snp_bottomMargin).offset(15)
+            make.height.equalTo(0)
+        }
+        
+        categoriesTitleLabel.snp.makeConstraints { make in
+            make.top.equalTo(breakingNewsCollectionView.snp.bottom).offset(30)
+            make.left.equalTo(breakingNewsLabel)
+        }
+        
+        viewAllCategoriesButton.snp.makeConstraints { make in
+            make.top.equalTo(breakingNewsCollectionView.snp.bottom).offset(30)
+            make.right.equalTo(viewAllNewsButton)
         }
         
         bottomColor.snp.makeConstraints { make in
-            make.bottom.left.right.equalTo(view)
-            make.height.equalTo(view).dividedBy(2)
+            make.bottom.left.right.equalTo(contentView)
+            make.height.equalTo(contentView).dividedBy(2)
         }
         
     }
@@ -195,18 +263,33 @@ class HomeViewController: UIViewController {
 extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 4
+            return articles.count
     }
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsCell.cellID, for: indexPath) as! NewsCell
-        cell.setContent(imageURL: "https://a.fsdn.com/sd/topics/bitcoin_64.png", title: "First Bitcoin ETF Could Be Coming Soon as Court Rules in Favor of Grayscale Over SEC", timeStamp: "2023-08-29T19:20:00Z", author: "Google News")
-        return cell
+        
+        if !articles.isEmpty {
+            let article = articles[indexPath.item]
+            
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsCell.cellID, for: indexPath) as! NewsCell
+                
+            cell.setContent(imageURL: article.urlToImage , title: article.title , timeStamp: article.publishedAt , author: article.source?.name )
+                return cell
+            } else
+            {
+                return UICollectionViewCell()
+                
+            }
+        
+            
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.height - 20 , height: collectionView.bounds.height)
-    }
+            return CGSize(width: collectionView.bounds.height - 20 , height: collectionView.bounds.height)
+            
+        }
+    
 
 }
