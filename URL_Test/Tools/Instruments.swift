@@ -8,11 +8,33 @@
 import Foundation
 import UIKit
 
+//MARK: - Utility instruments
+
+func urlToImage(url string: String, completion: @escaping (UIImage?) -> Void){
+    DispatchQueue.global(qos: .userInitiated).async {
+        
+        guard let url = URL(string: string) else {return}
+        
+        do {
+          let imageData = try Data(contentsOf: url)
+            let image = UIImage(data: imageData)
+            DispatchQueue.main.async {
+                completion(image)
+            }
+        } catch  {
+            print(error.localizedDescription)
+        }
+           
+    }
+    
+    
+}
 func composedURL(category: String, pageNumber: Int, resultsForPage: Int) -> String {
     let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&apiKey=\(shared.APIKey)"
     return url
 }
 
+//MARK: - Parsers
 
 func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> Void){
     DispatchQueue.global(qos: .userInitiated).async {
@@ -47,22 +69,4 @@ func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> 
 }
 
 
-func urlToImage(url string: String, completion: @escaping (UIImage?) -> Void){
-    DispatchQueue.global(qos: .userInitiated).async {
-        
-        guard let url = URL(string: string) else {return}
-        
-        do {
-          let imageData = try Data(contentsOf: url)
-            let image = UIImage(data: imageData)
-            DispatchQueue.main.async {
-                completion(image)
-            }
-        } catch  {
-            print(error.localizedDescription)
-        }
-           
-    }
-    
-    
-}
+

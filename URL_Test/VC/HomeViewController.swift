@@ -10,9 +10,11 @@ import SnapKit
 
 class HomeViewController: UIViewController {
     
+    //MARK: - Data properties
     private var articles = [Article]()
+    private var newsPage = 1
     
-    //MARK: UI Elements
+    //MARK: - UI Elements
     lazy private var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.contentSize = CGSize(width: view.frame.width, height: view.frame.height)
@@ -102,13 +104,13 @@ class HomeViewController: UIViewController {
     }()
     lazy private var breakingNewsCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 20
+        layout.minimumLineSpacing = 35
         layout.scrollDirection = .horizontal
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .clear
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
-        return collectionView
+        let breakingNewsCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        breakingNewsCollectionView.showsHorizontalScrollIndicator = false
+        breakingNewsCollectionView.backgroundColor = .clear
+        breakingNewsCollectionView.contentInset = UIEdgeInsets(top: 0, left: 35, bottom: 0, right: 35)
+        return breakingNewsCollectionView
     }()
     lazy private var categoriesTitleLabel: UILabel = {
         let categoriesTitleLabel = UILabel()
@@ -124,13 +126,28 @@ class HomeViewController: UIViewController {
         viewAllCategoriesButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         return viewAllCategoriesButton
     }()
+    lazy private var categoriesCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        let categoriesCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        categoriesCollectionView.showsHorizontalScrollIndicator = false
+        categoriesCollectionView.backgroundColor = .clear
+        categoriesCollectionView.contentInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+        layout.minimumLineSpacing = 20
+        layout.scrollDirection = .horizontal
+        return categoriesCollectionView
+    }()
+    lazy private var pullToRefresh: UIRefreshControl = {
+        let pullToRefresh = UIRefreshControl()
+        pullToRefresh.tintColor = .lightLightGray
+        pullToRefresh.addTarget(self, action: #selector(refreshNews), for: .valueChanged)
+        return pullToRefresh
+    }()
 
-    
-
-    //MARK: ViewController Lifecycle
-    
+    //MARK: - ViewController Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        scrollView.refreshControl = pullToRefresh
         
         view.backgroundColor = UIColor.primary
         
@@ -154,20 +171,25 @@ class HomeViewController: UIViewController {
         
         contentView.addSubview(categoriesTitleLabel)
         contentView.addSubview(viewAllCategoriesButton)
-                
+        
+        contentView.addSubview(categoriesCollectionView)
+                        
         makeConstraints()
         
         breakingNewsCollectionView.register(NewsCell.self, forCellWithReuseIdentifier: NewsCell.cellID)
         breakingNewsCollectionView.delegate = self
         breakingNewsCollectionView.dataSource = self
         
+        categoriesCollectionView.register(CategoryCell.self, forCellWithReuseIdentifier: CategoryCell.cellID)
+        categoriesCollectionView.delegate = self
+        categoriesCollectionView.dataSource = self
         
         DispatchQueue.main.async { [unowned self] in
-            parseNewsArticles(url: composedURL(category: "breaking", pageNumber: 1, resultsForPage: 10)) { articles in
+            parseNewsArticles(url: composedURL(category: "breaking", pageNumber: newsPage, resultsForPage: 10)) { articles in
                 self.articles = articles
                 UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
                     self.breakingNewsCollectionView.snp.updateConstraints { make in
-                        make.height.equalTo(350)
+                        make.height.equalTo(400)
                     }
                 } completion: { _ in
                     self.breakingNewsCollectionView.reloadData()
@@ -177,10 +199,8 @@ class HomeViewController: UIViewController {
         }
         
     }
-    
-    //MARK: Other methods
-    
-    
+
+    //MARK: - Other methods
     func makeConstraints(){
         
         let margins = view.safeAreaLayoutGuide
@@ -230,23 +250,30 @@ class HomeViewController: UIViewController {
         
         breakingNewsCollectionView.snp.makeConstraints { make in
             make.left.right.equalTo(contentView)
-            make.top.equalTo(viewAllNewsButton.snp_bottomMargin).offset(15)
+            make.top.equalTo(viewAllNewsButton.snp_bottomMargin)
             make.height.equalTo(0)
         }
         
         categoriesTitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(breakingNewsCollectionView.snp.bottom).offset(30)
+            make.top.equalTo(breakingNewsCollectionView.snp.bottom)
             make.left.equalTo(breakingNewsLabel)
         }
         
         viewAllCategoriesButton.snp.makeConstraints { make in
-            make.top.equalTo(breakingNewsCollectionView.snp.bottom).offset(30)
+            make.top.equalTo(breakingNewsCollectionView.snp.bottom)
             make.right.equalTo(viewAllNewsButton)
+        }
+        
+        categoriesCollectionView.snp.makeConstraints { make in
+            make.top.equalTo(viewAllCategoriesButton.snp_bottomMargin)
+            make.left.right.equalTo(contentView)
+            make.height.equalTo(100)
         }
         
         bottomColor.snp.makeConstraints { make in
             make.bottom.left.right.equalTo(contentView)
             make.height.equalTo(contentView).dividedBy(2)
+            
         }
         
     }
@@ -255,40 +282,74 @@ class HomeViewController: UIViewController {
         return .lightContent
     }
     
+    @objc func refreshNews(){
+        newsPage += 1
+        DispatchQueue.main.async { [unowned self] in
+            parseNewsArticles(url: composedURL(category: "breaking", pageNumber: newsPage, resultsForPage: 10)) { articles in
+                self.articles = articles
+                UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
+                    self.breakingNewsCollectionView.snp.updateConstraints { make in
+                        make.height.equalTo(400)
+                    }
+                } completion: { _ in
+                    self.breakingNewsCollectionView.reloadData()
+                    self.scrollView.refreshControl?.endRefreshing()
+                }
+
+            }
+        }
+    }
+    
 }
-
-
-// MARK: CollectionView methods
-
+// MARK: - CollectionView methods
 extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if collectionView == self.breakingNewsCollectionView {
             return articles.count
+        }
+        if collectionView == self.categoriesCollectionView {
+            return shared.categoriesArray.count
+        }
+        return 0
     }
     
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        if !articles.isEmpty {
-            let article = articles[indexPath.item]
-            
-                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsCell.cellID, for: indexPath) as! NewsCell
+        if collectionView == self.breakingNewsCollectionView {
+            if !articles.isEmpty {
+                let article = articles[indexPath.item]
                 
-            cell.setContent(imageURL: article.urlToImage , title: article.title , timeStamp: article.publishedAt , author: article.source?.name )
-                return cell
-            } else
-            {
-                return UICollectionViewCell()
-                
-            }
-        
+                    let newsCell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsCell.cellID, for: indexPath) as! NewsCell
+                    
+                newsCell.setContent(imageURL: article.urlToImage , title: article.title , timeStamp: article.publishedAt , author: article.source?.name )
+                    return newsCell
+                } else {
+                    return UICollectionViewCell()
+                }
+        }
             
-        
+        if collectionView == self.categoriesCollectionView {
+            let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCell.cellID, for: indexPath) as! CategoryCell
+            let categoty = shared.categoriesArray[indexPath.item]
+            categoryCell.setType(type: categoty.type)
+            return categoryCell
+        }
+        return UICollectionViewCell()
+
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-            return CGSize(width: collectionView.bounds.height - 20 , height: collectionView.bounds.height)
-            
+        
+        if collectionView == self.breakingNewsCollectionView {
+            return CGSize(width: collectionView.bounds.height - 70 , height: collectionView.bounds.height - 50)
+            }
+        
+        if collectionView == self.categoriesCollectionView {
+            return CGSize(width: 200 , height: 50)
+        }
+        return CGSize()
         }
     
 

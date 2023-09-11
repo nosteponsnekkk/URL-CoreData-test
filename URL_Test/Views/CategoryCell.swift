@@ -8,7 +8,6 @@
 import UIKit
 
 class CategoryCell: UICollectionViewCell {
-    
     //MARK: - CELL ID
     
     public static let cellID = UUID().uuidString
@@ -26,6 +25,7 @@ class CategoryCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
+   
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupCell()
@@ -40,19 +40,29 @@ class CategoryCell: UICollectionViewCell {
         layer.cornerRadius = 15
         clipsToBounds = true
                 
+        layer.masksToBounds = false
+        layer.shadowPath = UIBezierPath(rect: self.bounds).cgPath
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowRadius = 10
+        layer.shadowOpacity = 0.1
+        
         addSubview(titleLabel)
        
     }
     private func makeConstraints(){
         titleLabel.snp.makeConstraints { make in
-            make.left.right.equalTo(self).inset(15)
-            make.centerY.equalTo(self)
-        }
+                make.left.right.equalTo(self).inset(15)
+                make.top.equalTo(self).inset(10)
+                make.bottom.lessThanOrEqualTo(self).inset(10) 
+            }
     }
-    //MARK: - Interface
+    public func setType(type: CategoryModel.Category){
+        
+        for category in shared.categoriesArray {
+            if category.type == type {
+                titleLabel.text = category.title
+            }
     
-   public func setCategory(category: String){
-        titleLabel.text = category
-    
+        }
     }
 }

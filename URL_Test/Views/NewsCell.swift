@@ -80,8 +80,8 @@ class NewsCell: UICollectionViewCell {
 
         layer.masksToBounds = false
         layer.shadowColor = UIColor.black.cgColor
-        layer.shadowRadius = 25
-        layer.shadowOpacity = 0.1
+        layer.shadowRadius = 15
+        layer.shadowOpacity = 0.3
         layer.shadowPath = UIBezierPath(rect: self.bounds).cgPath
         
         addSubview(imageView)
@@ -107,6 +107,7 @@ class NewsCell: UICollectionViewCell {
         dateLabel.snp.makeConstraints { make in
             make.left.equalTo(self).offset(15)
             make.bottom.equalTo(self).offset(-30)
+            make.width.equalTo(150)
         }
         authorLabel.snp.makeConstraints { make in
             make.right.equalTo(self).offset(-15)
@@ -120,6 +121,7 @@ class NewsCell: UICollectionViewCell {
     public func setContent(imageURL: String?, title: String?, timeStamp: String?, author name: String?){
         if let timeStamp = timeStamp {
             dateLabel.text = "🕒 \(Date().timeAgoDisplay(timeStamp: timeStamp))"
+            
         }
         
         authorLabel.text = "by \(name ?? "Unknown")"
@@ -135,8 +137,8 @@ class NewsCell: UICollectionViewCell {
                 }
             } else {
                 self.imageView.image = UIImage(named: "noImageFound")
+                self.activityIndicator.removeFromSuperview()
             }
-            
         }
         
         

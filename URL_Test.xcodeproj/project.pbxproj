@@ -23,6 +23,7 @@
 		7C6590F52AAF514400CF9EFA /* CategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590F42AAF514400CF9EFA /* CategoryCell.swift */; };
 		7C6590F72AAF59E800CF9EFA /* NewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590F62AAF59E800CF9EFA /* NewsModel.swift */; };
 		7C6590F92AAF607700CF9EFA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590F82AAF607700CF9EFA /* Constants.swift */; };
+		7C6590FF2AAF9C6C00CF9EFA /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590FE2AAF9C6C00CF9EFA /* CategoryModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 		7C6590F42AAF514400CF9EFA /* CategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCell.swift; sourceTree = "<group>"; };
 		7C6590F62AAF59E800CF9EFA /* NewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsModel.swift; sourceTree = "<group>"; };
 		7C6590F82AAF607700CF9EFA /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		7C6590FE2AAF9C6C00CF9EFA /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				7C6590F62AAF59E800CF9EFA /* NewsModel.swift */,
+				7C6590FE2AAF9C6C00CF9EFA /* CategoryModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -239,6 +242,7 @@
 				7C6590E02AAE350300CF9EFA /* Extensions.swift in Sources */,
 				7C6590EF2AAF431600CF9EFA /* DiscoverViewController.swift in Sources */,
 				7C6590E82AAE6D5A00CF9EFA /* Instruments.swift in Sources */,
+				7C6590FF2AAF9C6C00CF9EFA /* CategoryModel.swift in Sources */,
 				7C6590E62AAE509300CF9EFA /* NewsCell.swift in Sources */,
 				7C6590F52AAF514400CF9EFA /* CategoryCell.swift in Sources */,
 			);

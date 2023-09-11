@@ -18,7 +18,6 @@ class MainTabBarController: UITabBarController {
         view.layer.cornerRadius = 3.3/2
         return view
     }()
-
     private lazy var indicatorWidth: Double = 0.5 * tabBar.bounds.width / CGFloat(tabBar.items?.count ?? 1)
     private var indicatorColor: UIColor = .black
 
@@ -101,7 +100,11 @@ class MainTabBarController: UITabBarController {
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         guard let items = tabBar.items else { return }
         moveIndicator(at: items.firstIndex(of: item) ?? 0)
+        
+        UIView.transition(with: view, duration: 0.1, options: .transitionCrossDissolve, animations: {
+            }, completion: nil)
     }
+    
 }
 
 
