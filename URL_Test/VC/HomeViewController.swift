@@ -285,6 +285,9 @@ class HomeViewController: UIViewController {
     @objc func refreshNews(){
         articles.removeAll()
         newsPage += 1
+        if newsPage == 5 {
+            newsPage = 1
+        }
         DispatchQueue.main.async { [unowned self] in
             parseNewsArticles(url: composedURL(category: "breaking", pageNumber: newsPage, resultsForPage: 10)) { articles in
                 self.articles = articles

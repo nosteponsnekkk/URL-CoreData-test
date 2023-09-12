@@ -14,9 +14,12 @@ import UIKit
 public final class imageCacher {
     
     private let cachedImages = NSCache<NSString, UIImage>()
+    private var activeTasks = [URL: URLSessionDataTask]()
+
     
     public func urlToImage(url string: String, completion: @escaping (UIImage?) -> Void){
         
+        // Creating IDs and URLs
         guard let absoluteString = NSURL(string: string)?.absoluteString else {return}
         guard let url = URL(string: string) else {return}
         let imageID = absoluteString as NSString
@@ -26,30 +29,45 @@ public final class imageCacher {
         
         if let image = getImageFromCache(url: imageID) {
             DispatchQueue.main.async {
-                print("✅ Loaded image from cache")
                 completion(image)
             }
             return
         }
         
-        // Loading and caching the image
-        DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
-            
-            do {
-                let imageData = try Data(contentsOf: url)
-                if let image = UIImage(data: imageData) {
-                        DispatchQueue.main.async {
-                            print("cached image!")
-                            self.cachedImages.setObject(image, forKey: imageID)
-                            completion(self.getImageFromCache(url: imageID))
-                        }
-                    }
-                    } catch  {
-                        print(error.localizedDescription)
-                    }
-         
-        }
+        //Canceling the task, if it's already exist
+        if let existingTask = activeTasks[url] {
+                    existingTask.cancel()
+                    activeTasks[url] = nil
+                }
         
+        
+        // Loading and caching the image
+        DispatchQueue.global(qos: .userInitiated).async  { [unowned self] in
+            
+            // Creating URL Task
+        let task = URLSession.shared.dataTask(with: url) {  (data, response, error) in
+            if let error = error {
+                print(error.localizedDescription)
+                completion(nil)
+                return
+            }
+            
+            guard let data = data, let image = UIImage(data: data) else { completion(nil); return}
+            
+                //Caching image
+                self.cachedImages.setObject(image, forKey: imageID)
+            
+                DispatchQueue.main.async {
+                    completion(image)
+                }
+            
+            }
+            
+            // Appending task = active tasks
+            activeTasks[url] = task
+            
+            task.resume()
+        }
     }
     
     private func getImageFromCache(url: NSString) -> UIImage? {
@@ -61,7 +79,7 @@ public final class imageCacher {
     //MARK: - Utility instruments
     
 func composedURL(category: String, pageNumber: Int, resultsForPage: Int) -> String {
-    let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&sources=bbc-news,google-news,wired,fox-news&apiKey=\(shared.APIKey)"
+    let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&sources=bbc-news,google-news,wired,fox-news,cnn&apiKey=\(shared.APIKey)"
     return url
 }
 
