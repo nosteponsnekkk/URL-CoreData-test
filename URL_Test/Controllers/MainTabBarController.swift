@@ -8,7 +8,6 @@
 import UIKit
 
 class MainTabBarController: UITabBarController {
-
     
     // MARK: - Properties
     private let indicatorView: UIView = {

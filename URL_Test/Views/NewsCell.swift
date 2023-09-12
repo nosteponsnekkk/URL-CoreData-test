@@ -13,6 +13,13 @@ class NewsCell: UICollectionViewCell {
     
     public static let cellID = UUID().uuidString
     
+    //MARK: - Enum
+    
+    enum Style {
+        case large
+        case small
+    }
+    
     //MARK: - Subviews
     
     private lazy var imageView: UIImageView = {
@@ -20,7 +27,7 @@ class NewsCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .lightLightGray
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 20
+       
         
         return imageView
 
@@ -37,7 +44,6 @@ class NewsCell: UICollectionViewCell {
     }()
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
         titleLabel.textColor = .black
         titleLabel.numberOfLines = 3
         titleLabel.backgroundColor = .white
@@ -47,7 +53,6 @@ class NewsCell: UICollectionViewCell {
         let dateLabel = UILabel()
         dateLabel.textColor = .lightGray
         dateLabel.backgroundColor = .white
-        dateLabel.font = UIFont.systemFont(ofSize: 18)
         return dateLabel
     }()
     private lazy var authorLabel: UILabel = {
@@ -55,7 +60,6 @@ class NewsCell: UICollectionViewCell {
         authorLabel.textColor = .lightGray
         authorLabel.backgroundColor = .white
         authorLabel.numberOfLines = 1
-        authorLabel.font = UIFont.systemFont(ofSize: 18)
         return authorLabel
     }()
                     
@@ -75,13 +79,12 @@ class NewsCell: UICollectionViewCell {
     private func setupCell(){
         
         backgroundColor = .white
-        layer.cornerRadius = 25
+        layer.cornerRadius = frame.height/12
+        imageView.layer.cornerRadius = layer.cornerRadius
         clipsToBounds = true
 
         layer.masksToBounds = false
         layer.shadowColor = UIColor.black.cgColor
-        layer.shadowRadius = 15
-        layer.shadowOpacity = 0.3
         layer.shadowPath = UIBezierPath(rect: self.bounds).cgPath
         
         addSubview(imageView)
@@ -121,27 +124,52 @@ class NewsCell: UICollectionViewCell {
     public func setContent(imageURL: String?, title: String?, timeStamp: String?, author name: String?){
         if let timeStamp = timeStamp {
             dateLabel.text = "🕒 \(Date().timeAgoDisplay(timeStamp: timeStamp))"
-            
         }
         
         authorLabel.text = "by \(name ?? "Unknown")"
         
         titleLabel.text = title
         
-        DispatchQueue.main.async { [unowned self] in
             if let imageURL = imageURL {
                 shared.cacher.urlToImage(url: imageURL) { image in
-                    self.imageView.image = image
-                    self.imageView.backgroundColor = .white
-                    self.activityIndicator.removeFromSuperview()
+                    DispatchQueue.main.async { [unowned self] in
+                        self.imageView.image = image
+                        self.activityIndicator.removeFromSuperview()
+                    }
+                    
                 }
             } else {
-                self.imageView.image = UIImage(named: "noImageFound")
-                self.activityIndicator.removeFromSuperview()
+                imageView.image = UIImage(named: "noImageFound")
+                activityIndicator.removeFromSuperview()
             }
+        
+        
+        
+        
+    }
+    
+    public func setStyle(style: Style) {
+        switch style {
+        case .large:
+            titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
+            dateLabel.font = UIFont.systemFont(ofSize: 18)
+            authorLabel.font = UIFont.systemFont(ofSize: 18)
+            layer.shadowRadius = 15
+            layer.shadowOpacity = 0.3
+        case .small:
+            titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
+            dateLabel.font = UIFont.systemFont(ofSize: 14)
+            authorLabel.font = UIFont.systemFont(ofSize: 14)
+            layer.shadowRadius = 5
+            layer.shadowOpacity = 0.1
+            authorLabel.removeFromSuperview()
+            dateLabel.removeFromSuperview()
+            
+            imageView.snp.updateConstraints { update in
+                update.top.left.right.equalTo(self)
+            }
+            
         }
-        
-        
         
     }
     

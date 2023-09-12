@@ -8,7 +8,6 @@
 import Foundation
 import UIKit
 
-
 //MARK: - Image Cacher Class
 
 public final class imageCacher {
@@ -16,7 +15,6 @@ public final class imageCacher {
     private let cachedImages = NSCache<NSString, UIImage>()
     private var activeTasks = [URL: URLSessionDataTask]()
 
-    
     public func urlToImage(url string: String, completion: @escaping (UIImage?) -> Void){
         
         // Creating IDs and URLs
@@ -75,8 +73,7 @@ public final class imageCacher {
     }
 }
 
-
-    //MARK: - Utility instruments
+//MARK: - Utility instruments
     
 func composedURL(category: String, pageNumber: Int, resultsForPage: Int) -> String {
     let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&sources=bbc-news,google-news,wired,fox-news,cnn&apiKey=\(shared.APIKey)"

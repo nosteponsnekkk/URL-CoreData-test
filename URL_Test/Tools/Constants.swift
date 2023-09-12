@@ -17,6 +17,5 @@ struct shared {
         CategoryModel(title: "🖥️ Technology", URLFormattedTitle: "technology", type: .technology),
         CategoryModel(title: "⚽ Sports", URLFormattedTitle: "sports", type: .sports),
         CategoryModel(title: "🏛️ Politics", URLFormattedTitle: "politics", type: .politics),
-
     ]
 }

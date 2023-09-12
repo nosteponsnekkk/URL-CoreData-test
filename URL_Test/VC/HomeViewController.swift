@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class HomeViewController: UIViewController {
+final class HomeViewController: UIViewController {
     
     //MARK: - Data properties
     private var articles = [Article]()
@@ -201,7 +201,7 @@ class HomeViewController: UIViewController {
     }
 
     //MARK: - Other methods
-    func makeConstraints(){
+    private func makeConstraints(){
         
         let margins = view.safeAreaLayoutGuide
         
@@ -282,7 +282,7 @@ class HomeViewController: UIViewController {
         return .lightContent
     }
     
-    @objc func refreshNews(){
+    @objc private func refreshNews(){
         articles.removeAll()
         newsPage += 1
         if newsPage == 5 {
@@ -303,8 +303,6 @@ class HomeViewController: UIViewController {
             }
         }
     }
-    
-
     
 }
 // MARK: - CollectionView methods
@@ -328,8 +326,8 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
                 let article = articles[indexPath.item]
                 
                     let newsCell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsCell.cellID, for: indexPath) as! NewsCell
-                    
-                newsCell.setContent(imageURL: article.urlToImage , title: article.title , timeStamp: article.publishedAt , author: article.source?.name )
+                newsCell.setStyle(style: .large)
+                newsCell.setContent(imageURL: article.urlToImage , title: article.title , timeStamp: article.publishedAt , author: article.source?.name)
                     return newsCell
                 } else {
                     return UICollectionViewCell()
