@@ -24,6 +24,7 @@
 		7C6590F72AAF59E800CF9EFA /* NewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590F62AAF59E800CF9EFA /* NewsModel.swift */; };
 		7C6590F92AAF607700CF9EFA /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590F82AAF607700CF9EFA /* Constants.swift */; };
 		7C6590FF2AAF9C6C00CF9EFA /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590FE2AAF9C6C00CF9EFA /* CategoryModel.swift */; };
+		7C6591012AAFB7D200CF9EFA /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6591002AAFB7D100CF9EFA /* SearchViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		7C6590F62AAF59E800CF9EFA /* NewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsModel.swift; sourceTree = "<group>"; };
 		7C6590F82AAF607700CF9EFA /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		7C6590FE2AAF9C6C00CF9EFA /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
+		7C6591002AAFB7D100CF9EFA /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +100,7 @@
 				7C6590EE2AAF431600CF9EFA /* DiscoverViewController.swift */,
 				7C6590F02AAF432700CF9EFA /* SavedViewController.swift */,
 				7C6590F22AAF433700CF9EFA /* UserViewController.swift */,
+				7C6591002AAFB7D100CF9EFA /* SearchViewController.swift */,
 			);
 			path = VC;
 			sourceTree = "<group>";
@@ -231,6 +234,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C6591012AAFB7D200CF9EFA /* SearchViewController.swift in Sources */,
 				7C6590F72AAF59E800CF9EFA /* NewsModel.swift in Sources */,
 				7C6590C52AAE29BF00CF9EFA /* AppDelegate.swift in Sources */,
 				7C6590F32AAF433700CF9EFA /* UserViewController.swift in Sources */,

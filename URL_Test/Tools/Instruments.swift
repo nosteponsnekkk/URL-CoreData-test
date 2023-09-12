@@ -8,29 +8,60 @@
 import Foundation
 import UIKit
 
-//MARK: - Utility instruments
 
-func urlToImage(url string: String, completion: @escaping (UIImage?) -> Void){
-    DispatchQueue.global(qos: .userInitiated).async {
+//MARK: - Image Cacher Class
+
+public final class imageCacher {
+    
+    private let cachedImages = NSCache<NSString, UIImage>()
+    
+    public func urlToImage(url string: String, completion: @escaping (UIImage?) -> Void){
         
+        guard let absoluteString = NSURL(string: string)?.absoluteString else {return}
         guard let url = URL(string: string) else {return}
+        let imageID = absoluteString as NSString
         
-        do {
-          let imageData = try Data(contentsOf: url)
-            let image = UIImage(data: imageData)
+
+        //Getting image from cache
+        
+        if let image = getImageFromCache(url: imageID) {
             DispatchQueue.main.async {
+                print("✅ Loaded image from cache")
                 completion(image)
             }
-        } catch  {
-            print(error.localizedDescription)
+            return
         }
-           
+        
+        // Loading and caching the image
+        DispatchQueue.global(qos: .userInitiated).async { [unowned self] in
+            
+            do {
+                let imageData = try Data(contentsOf: url)
+                if let image = UIImage(data: imageData) {
+                        DispatchQueue.main.async {
+                            print("cached image!")
+                            self.cachedImages.setObject(image, forKey: imageID)
+                            completion(self.getImageFromCache(url: imageID))
+                        }
+                    }
+                    } catch  {
+                        print(error.localizedDescription)
+                    }
+         
+        }
+        
     }
     
-    
+    private func getImageFromCache(url: NSString) -> UIImage? {
+        return cachedImages.object(forKey: url)
+    }
 }
+
+
+    //MARK: - Utility instruments
+    
 func composedURL(category: String, pageNumber: Int, resultsForPage: Int) -> String {
-    let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&apiKey=\(shared.APIKey)"
+    let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&sources=bbc-news,google-news,wired,fox-news&apiKey=\(shared.APIKey)"
     return url
 }
 

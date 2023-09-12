@@ -130,7 +130,7 @@ class NewsCell: UICollectionViewCell {
         
         DispatchQueue.main.async { [unowned self] in
             if let imageURL = imageURL {
-                urlToImage(url: imageURL) { image in
+                shared.cacher.urlToImage(url: imageURL) { image in
                     self.imageView.image = image
                     self.imageView.backgroundColor = .white
                     self.activityIndicator.removeFromSuperview()

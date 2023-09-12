@@ -283,6 +283,7 @@ class HomeViewController: UIViewController {
     }
     
     @objc func refreshNews(){
+        articles.removeAll()
         newsPage += 1
         DispatchQueue.main.async { [unowned self] in
             parseNewsArticles(url: composedURL(category: "breaking", pageNumber: newsPage, resultsForPage: 10)) { articles in
@@ -299,6 +300,8 @@ class HomeViewController: UIViewController {
             }
         }
     }
+    
+
     
 }
 // MARK: - CollectionView methods
