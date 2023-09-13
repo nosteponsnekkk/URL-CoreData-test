@@ -9,8 +9,15 @@ import UIKit
 
 final class DiscoverViewController: UIViewController {
     
+    //MARK: - Util variavbles
+    private var didLoadMoreNews = false
+    private var newsCount = 10
+    private var lastContentOffsetY: CGFloat = 0
+    
+    //MARK: - Data
     private var articles = [Article]()
     
+    //MARK: - Subviews
     private lazy var searchTextField: UISearchTextField = {
         let searchTextField = UISearchTextField()
         searchTextField.clipsToBounds = true
@@ -41,14 +48,15 @@ final class DiscoverViewController: UIViewController {
         return newsCollectionView
     }()
     
-
+    //MARK: - ViewController Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
         
-        DispatchQueue.main.async { [unowned self] in
-            parseNewsArticles(url: composedURL(category: "news", pageNumber: 1, resultsForPage: 100)) { articles in
+        
+            parseNewsArticles(url: composedURL(category: "news", pageNumber: 1, resultsForPage: 15)) { [unowned self] articles in
                 self.articles = articles
+                DispatchQueue.main.async {
                 self.newsCollectionView.reloadData()
                 }
 
@@ -75,6 +83,7 @@ final class DiscoverViewController: UIViewController {
      
     }
     
+    //MARK: - Other Methods
     private func makeConstraints(){
         
         let margins = view.safeAreaLayoutGuide
@@ -97,23 +106,21 @@ final class DiscoverViewController: UIViewController {
         }
         
     }
-    
     private func searchNews(search: String){
         articles.removeAll()
-        shared.cacher.clearCache()
         newsCollectionView.reloadData()
-            parseNewsArticles(url: composedURL(category: search, pageNumber: 1, resultsForPage: 10)) { articles in
+            parseNewsArticles(url: composedURL(category: search, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles  in
                 self.articles = articles
-                DispatchQueue.main.async { [unowned self] in
+                DispatchQueue.main.async {
                     self.newsCollectionView.reloadData()
                 }
 
             }
         }
     
-   
 }
 
+//MARK: - CollectionView delegates
 extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -166,8 +173,10 @@ extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollecti
     
 
 }
+
+//MARK: - Search delegates
 extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegate {
-    
+
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == searchTextField {
@@ -188,4 +197,28 @@ extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegat
     }
 
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let screenHeight = scrollView.frame.size.height
+
+        if offsetY > contentHeight - screenHeight {
+            if !didLoadMoreNews && offsetY > lastContentOffsetY {
+                didLoadMoreNews = true
+                lastContentOffsetY = offsetY 
+
+                newsCount += 10
+
+                ImageCacher.cacher.clearCache()
+                parseNewsArticles(url: composedURL(category: "news", pageNumber: 1, resultsForPage: newsCount)) { [unowned self] updatedArticles in
+                    self.articles = updatedArticles
+                    DispatchQueue.main.async {
+                        self.newsCollectionView.reloadData()
+                        didLoadMoreNews = false
+                    }
+                }
+            }
+        }
+    }
+
 }

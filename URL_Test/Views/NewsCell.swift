@@ -126,7 +126,7 @@ class NewsCell: UICollectionViewCell {
         titleLabel.text = title
         
             if let imageURL = imageURL {
-                shared.cacher.urlToImage(url: imageURL) { image in
+                ImageCacher.cacher.urlToImage(url: imageURL) { image in
                     DispatchQueue.main.async { [unowned self] in
                         self.imageView.image = image
                         self.activityIndicator.removeFromSuperview()

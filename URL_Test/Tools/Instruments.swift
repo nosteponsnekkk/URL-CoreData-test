@@ -10,7 +10,9 @@ import UIKit
 
 //MARK: - Image Cacher Class
 
-public final class imageCacher {
+public final class ImageCacher {
+    
+    public static let cacher = ImageCacher()
     
     private let cachedImages = NSCache<NSString, UIImage>()
     private var activeTasks = [URL: URLSessionDataTask]()
@@ -40,7 +42,7 @@ public final class imageCacher {
         
         
         // Loading and caching the image
-        DispatchQueue.global(qos: .userInitiated).async  { [unowned self] in
+        DispatchQueue.main.async  { [unowned self] in
             
             // Creating URL Task
         let task = URLSession.shared.dataTask(with: url) {  (data, response, error) in
@@ -52,7 +54,7 @@ public final class imageCacher {
             guard let data = data, let image = UIImage(data: data) else { completion(nil); return}
             
                 //Caching image
-                self.cachedImages.setObject(image, forKey: imageID)
+            self.cachedImages.setObject(image, forKey: imageID, cost: data.count)
             
                 DispatchQueue.main.async {
                     completion(image)
@@ -78,7 +80,7 @@ public final class imageCacher {
 //MARK: - Utility instruments
     
 func composedURL(category: String, pageNumber: Int, resultsForPage: Int) -> String {
-    let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&sources=bbc-news,google-news,wired,fox-news,cnn&apiKey=\(shared.APIKey)"
+    let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&sources=bbc-news,google-news,wired,fox-news,cnn&apiKey=\(shared.APIKey2)"
     return url
 }
 

@@ -289,21 +289,25 @@ final class HomeViewController: UIViewController {
             newsPage = 1
         }
         breakingNewsCollectionView.reloadData()
-        shared.cacher.clearCache()
-        DispatchQueue.main.async { [unowned self] in
-            parseNewsArticles(url: composedURL(category: "breaking", pageNumber: newsPage, resultsForPage: 10)) { articles in
+        
+            parseNewsArticles(url: composedURL(category: "breaking", pageNumber: self.newsPage, resultsForPage: 10)) { [unowned self] articles in
                 self.articles = articles
-                UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
-                    self.breakingNewsCollectionView.snp.updateConstraints { make in
-                        make.height.equalTo(400)
+                
+                DispatchQueue.main.async {
+                    UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
+                        self.breakingNewsCollectionView.snp.updateConstraints { make in
+                            make.height.equalTo(400)
+                        }
+                    } completion: { _ in
+                            self.breakingNewsCollectionView.reloadData()
+                            self.scrollView.refreshControl?.endRefreshing()
+                        
                     }
-                } completion: { _ in
-                    self.breakingNewsCollectionView.reloadData()
-                    self.scrollView.refreshControl?.endRefreshing()
                 }
+               
 
             }
-        }
+        
     }
     
 }
