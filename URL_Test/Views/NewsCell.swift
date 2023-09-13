@@ -27,8 +27,6 @@ class NewsCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .lightLightGray
         imageView.clipsToBounds = true
-       
-        
         return imageView
 
         }()
@@ -37,9 +35,6 @@ class NewsCell: UICollectionViewCell {
         activityIndicator.color = .white
         activityIndicator.startAnimating()
         activityIndicator.style = .large
-        
-        
-        
         return activityIndicator
     }()
     private lazy var titleLabel: UILabel = {
@@ -79,7 +74,7 @@ class NewsCell: UICollectionViewCell {
     private func setupCell(){
         
         backgroundColor = .white
-        layer.cornerRadius = frame.height/12
+        layer.cornerRadius = frame.height/16
         imageView.layer.cornerRadius = layer.cornerRadius
         clipsToBounds = true
 
@@ -119,7 +114,7 @@ class NewsCell: UICollectionViewCell {
         }
     }
     
-    //MARK: - Interface
+    //MARK: - Interfaces
     
     public func setContent(imageURL: String?, title: String?, timeStamp: String?, author name: String?){
         if let timeStamp = timeStamp {
@@ -147,7 +142,6 @@ class NewsCell: UICollectionViewCell {
         
         
     }
-    
     public func setStyle(style: Style) {
         switch style {
         case .large:
@@ -172,5 +166,4 @@ class NewsCell: UICollectionViewCell {
         }
         
     }
-    
 }

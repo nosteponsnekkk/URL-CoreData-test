@@ -11,7 +11,6 @@ final class DiscoverViewController: UIViewController {
     
     private var articles = [Article]()
     
-    
     private lazy var searchTextField: UISearchTextField = {
         let searchTextField = UISearchTextField()
         searchTextField.clipsToBounds = true
@@ -46,6 +45,7 @@ final class DiscoverViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        
         DispatchQueue.main.async { [unowned self] in
             parseNewsArticles(url: composedURL(category: "news", pageNumber: 1, resultsForPage: 100)) { articles in
                 self.articles = articles
@@ -70,6 +70,9 @@ final class DiscoverViewController: UIViewController {
         newsCollectionView.register(NewsCell.self, forCellWithReuseIdentifier: NewsCell.cellID)
         newsCollectionView.delegate = self
         newsCollectionView.dataSource = self
+        
+        searchTextField.delegate = self
+     
     }
     
     private func makeConstraints(){
@@ -95,8 +98,21 @@ final class DiscoverViewController: UIViewController {
         
     }
     
-}
+    private func searchNews(search: String){
+        articles.removeAll()
+        shared.cacher.clearCache()
+        newsCollectionView.reloadData()
+            parseNewsArticles(url: composedURL(category: search, pageNumber: 1, resultsForPage: 10)) { articles in
+                self.articles = articles
+                DispatchQueue.main.async { [unowned self] in
+                    self.newsCollectionView.reloadData()
+                }
 
+            }
+        }
+    
+   
+}
 
 extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
@@ -149,4 +165,27 @@ extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollecti
         }
     
 
+}
+extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegate {
+    
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == searchTextField {
+            textField.sendActions(for: .editingDidEnd)
+            textField.resignFirstResponder()
+            
+            if let text = textField.text?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) {
+                if !text.isEmpty{
+                searchNews(search: text)
+                }
+            }
+        }
+        return true
+    }
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        searchTextField.resignFirstResponder()
+    }
+
+    
 }

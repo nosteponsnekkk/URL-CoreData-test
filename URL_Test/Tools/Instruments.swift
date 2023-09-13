@@ -44,8 +44,7 @@ public final class imageCacher {
             
             // Creating URL Task
         let task = URLSession.shared.dataTask(with: url) {  (data, response, error) in
-            if let error = error {
-                print(error.localizedDescription)
+            if error != nil {
                 completion(nil)
                 return
             }
@@ -70,6 +69,9 @@ public final class imageCacher {
     
     private func getImageFromCache(url: NSString) -> UIImage? {
         return cachedImages.object(forKey: url)
+    }
+    public func clearCache(){
+        cachedImages.removeAllObjects()
     }
 }
 

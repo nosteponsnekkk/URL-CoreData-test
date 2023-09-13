@@ -288,6 +288,8 @@ final class HomeViewController: UIViewController {
         if newsPage == 5 {
             newsPage = 1
         }
+        breakingNewsCollectionView.reloadData()
+        shared.cacher.clearCache()
         DispatchQueue.main.async { [unowned self] in
             parseNewsArticles(url: composedURL(category: "breaking", pageNumber: newsPage, resultsForPage: 10)) { articles in
                 self.articles = articles
