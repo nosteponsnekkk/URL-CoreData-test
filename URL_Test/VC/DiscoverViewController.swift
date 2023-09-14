@@ -11,8 +11,9 @@ final class DiscoverViewController: UIViewController {
     
     //MARK: - Util variavbles
     private var didLoadMoreNews = false
-    private var newsCount = 10
+    private var newsCount = 15
     private var lastContentOffsetY: CGFloat = 0
+    private var searchContex = "news"
     
     //MARK: - Data
     private var articles = [Article]()
@@ -52,17 +53,6 @@ final class DiscoverViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        
-        
-            parseNewsArticles(url: composedURL(category: "news", pageNumber: 1, resultsForPage: 15)) { [unowned self] articles in
-                self.articles = articles
-                DispatchQueue.main.async {
-                self.newsCollectionView.reloadData()
-                }
-
-            }
-        
-        
         view.backgroundColor = .sand
         
         view.addSubview(searchTextField)
@@ -81,6 +71,24 @@ final class DiscoverViewController: UIViewController {
         
         searchTextField.delegate = self
      
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let searchQuery = (self.tabBarController as? MainTabBarController)?.searchQuery {
+            searchTextField.text = searchQuery
+            searchNews(search: searchQuery)
+        } else {
+            parseNewsArticles(url: composedURL(category: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles in
+                self.articles = articles
+                DispatchQueue.main.async {
+                self.newsCollectionView.reloadData()
+                }
+
+            }
+        }
+
     }
     
     //MARK: - Other Methods
@@ -107,9 +115,10 @@ final class DiscoverViewController: UIViewController {
         
     }
     private func searchNews(search: String){
+        searchContex = search
         articles.removeAll()
         newsCollectionView.reloadData()
-            parseNewsArticles(url: composedURL(category: search, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles  in
+            parseNewsArticles(url: composedURL(category: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles  in
                 self.articles = articles
                 DispatchQueue.main.async {
                     self.newsCollectionView.reloadData()
@@ -118,6 +127,7 @@ final class DiscoverViewController: UIViewController {
             }
         }
     
+  
 }
 
 //MARK: - CollectionView delegates
@@ -185,6 +195,7 @@ extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegat
             
             if let text = textField.text?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) {
                 if !text.isEmpty{
+                searchContex = text
                 searchNews(search: text)
                 }
             }
@@ -207,10 +218,10 @@ extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegat
                 didLoadMoreNews = true
                 lastContentOffsetY = offsetY 
 
-                newsCount += 10
+                newsCount += 15
 
                 ImageCacher.cacher.clearCache()
-                parseNewsArticles(url: composedURL(category: "news", pageNumber: 1, resultsForPage: newsCount)) { [unowned self] updatedArticles in
+                parseNewsArticles(url: composedURL(category: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] updatedArticles in
                     self.articles = updatedArticles
                     DispatchQueue.main.async {
                         self.newsCollectionView.reloadData()

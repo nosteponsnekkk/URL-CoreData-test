@@ -10,6 +10,8 @@ import SnapKit
 
 final class HomeViewController: UIViewController {
     
+    private var discoverVC: DiscoverViewController?
+    
     //MARK: - Data properties
     private var articles = [Article]()
     private var newsPage = 1
@@ -184,6 +186,9 @@ final class HomeViewController: UIViewController {
         categoriesCollectionView.delegate = self
         categoriesCollectionView.dataSource = self
         
+        searchTextField.delegate = self
+        scrollView.delegate = self
+        
         DispatchQueue.main.async { [unowned self] in
             parseNewsArticles(url: composedURL(category: "breaking", pageNumber: newsPage, resultsForPage: 10)) { articles in
                 self.articles = articles
@@ -311,7 +316,7 @@ final class HomeViewController: UIViewController {
     }
     
 }
-// MARK: - CollectionView methods
+// MARK: - CollectionView extension
 extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -364,3 +369,34 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
     
 
 }
+
+//MARK: - Search delegates
+extension HomeViewController: UISearchTextFieldDelegate, UIScrollViewDelegate {
+
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == searchTextField {
+            textField.sendActions(for: .editingDidEnd)
+            textField.resignFirstResponder()
+            if let text = textField.text?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) {
+                if !text.isEmpty{
+                    if let tabBarController = self.tabBarController as? MainTabBarController {
+                    tabBarController.searchQuery = text
+                    tabBarController.switchToTab(1)
+                    }
+                }
+            }
+        }
+        return true
+    }
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+            searchTextField.resignFirstResponder()
+        
+        
+    }
+
+    
+
+}
+

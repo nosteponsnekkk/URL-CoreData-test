@@ -9,6 +9,7 @@ import UIKit
 
 class MainTabBarController: UITabBarController {
     
+    
     // MARK: - Properties
     private let indicatorView: UIView = {
         let view = UIView()
@@ -29,7 +30,6 @@ class MainTabBarController: UITabBarController {
         generateTabBar()
         setTabBarAppearance()
     }
-
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         moveIndicator()
@@ -37,7 +37,7 @@ class MainTabBarController: UITabBarController {
 
     // MARK: - Methods
     
-    func moveIndicator(at index: Int=0) {
+    private func moveIndicator(at index: Int=0) {
         
         let itemWidth = (tabBar.bounds.width / CGFloat(tabBar.items?.count ?? 1))
         
@@ -51,24 +51,21 @@ class MainTabBarController: UITabBarController {
             self.indicatorView.backgroundColor = self.indicatorColor
         }
     }
-
-    func generateTabBar(){
+    private func generateTabBar(){
         viewControllers = [generateVC(viewController: HomeViewController(), image: UIImage(named: "home.icon")),
                            generateVC(viewController: DiscoverViewController(), image: UIImage(named: "discover")),
                            generateVC(viewController: SavedViewController(), image: UIImage(named: "saved")),
                            generateVC(viewController: UserViewController(), image: UIImage(named: "profile"))
         ]
     }
-    
-    func generateVC(viewController: UIViewController, image: UIImage?) -> UIViewController{
+    private func generateVC(viewController: UIViewController, image: UIImage?) -> UIViewController{
         let resizedImage = image?.resize(to: CGSize(width: 30, height: 30))
             viewController.tabBarItem.image = resizedImage
         let navigationController = UINavigationController(rootViewController: viewController)
         navigationController.isNavigationBarHidden = true
         return navigationController
     }
-    
-    func setTabBarAppearance(){
+    private func setTabBarAppearance(){
         let x: CGFloat = 0
         
         let y: CGFloat = -10
@@ -99,10 +96,17 @@ class MainTabBarController: UITabBarController {
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         guard let items = tabBar.items else { return }
         moveIndicator(at: items.firstIndex(of: item) ?? 0)
-        
         UIView.transition(with: view, duration: 0.1, options: .transitionCrossDissolve, animations: {
             }, completion: nil)
     }
+    
+    //MARK: - Interface
+    public var searchQuery: String?
+    
+    public func switchToTab(_ tabIndex: Int) {
+            moveIndicator(at: tabIndex)
+            selectedIndex = tabIndex
+        }
     
 }
 
