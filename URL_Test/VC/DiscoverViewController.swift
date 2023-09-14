@@ -72,7 +72,6 @@ final class DiscoverViewController: UIViewController {
         searchTextField.delegate = self
      
     }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -127,7 +126,6 @@ final class DiscoverViewController: UIViewController {
             }
         }
     
-  
 }
 
 //MARK: - CollectionView delegates

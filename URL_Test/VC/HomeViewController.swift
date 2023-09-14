@@ -9,9 +9,7 @@ import UIKit
 import SnapKit
 
 final class HomeViewController: UIViewController {
-    
-    private var discoverVC: DiscoverViewController?
-    
+        
     //MARK: - Data properties
     private var articles = [Article]()
     private var newsPage = 1
@@ -88,6 +86,7 @@ final class HomeViewController: UIViewController {
         searchTextField.backgroundColor = .transparentWhite
         searchTextField.clipsToBounds = true
         searchTextField.layer.cornerRadius = 15
+        searchTextField.textColor = .white
         return searchTextField
     }()
     lazy private var breakingNewsLabel: UILabel = {
@@ -329,7 +328,6 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
         return 0
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         if collectionView == self.breakingNewsCollectionView {
@@ -342,9 +340,8 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
                     return newsCell
                 } else {
                     return UICollectionViewCell()
-                }
+            }
         }
-            
         if collectionView == self.categoriesCollectionView {
             let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCell.cellID, for: indexPath) as! CategoryCell
             let categoty = shared.categoriesArray[indexPath.item]
@@ -352,7 +349,6 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             return categoryCell
         }
         return UICollectionViewCell()
-
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -373,7 +369,6 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
 //MARK: - Search delegates
 extension HomeViewController: UISearchTextFieldDelegate, UIScrollViewDelegate {
 
-
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == searchTextField {
             textField.sendActions(for: .editingDidEnd)
@@ -392,11 +387,6 @@ extension HomeViewController: UISearchTextFieldDelegate, UIScrollViewDelegate {
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
             searchTextField.resignFirstResponder()
-        
-        
     }
-
-    
-
 }
 
