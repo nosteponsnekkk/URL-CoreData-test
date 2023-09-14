@@ -18,4 +18,21 @@ struct shared {
         CategoryModel(title: "⚽ Sports", URLFormattedTitle: "sports", type: .sports),
         CategoryModel(title: "🏛️ Politics", URLFormattedTitle: "politics", type: .politics),
     ]
+ 
+    struct sources {
+        static let CNN = "cnn"
+        static let BBC = "bbc-news"
+        static let GoogleNews = "google-news"
+        static let Wired = "wired"
+        static let FoxNews = "fox-news"
+        static let BusinessInsider = "business-insider"
+        static let ABCNews = "abc-news"
+        static let Engadget = "engadget"
+        static let TheVerge = "the-verge"
+        static let ArsTechnica = "ars-technica"
+        static let BleacherSport = "bleacher-report"
+        static let TechRadar = "techradar"
+        static let Time = "time"
+        static let ViceNews = "vice-news"
+    }
 }

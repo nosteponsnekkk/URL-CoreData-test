@@ -21,6 +21,7 @@ public final class ImageCacher {
         
         // Creating IDs and URLs
         guard let absoluteString = NSURL(string: string)?.absoluteString else {return}
+        guard isHTTPS(urlString: absoluteString) else {return}
         guard let url = URL(string: string) else {return}
         let imageID = absoluteString as NSString
         
@@ -72,6 +73,13 @@ public final class ImageCacher {
     private func getImageFromCache(url: NSString) -> UIImage? {
         return cachedImages.object(forKey: url)
     }
+    private func isHTTPS(urlString: String) -> Bool {
+        if let url = URL(string: urlString) {
+            return url.scheme == "https"
+        }
+        print("⚠️ URL Making Error: The connection is not secure!")
+        return false
+    }
     public func clearCache(){
         cachedImages.removeAllObjects()
     }
@@ -79,9 +87,73 @@ public final class ImageCacher {
 
 //MARK: - Utility instruments
     
-func composedURL(category: String, pageNumber: Int, resultsForPage: Int) -> String {
-    let url = "https://newsapi.org/v2/everything?q=\(category)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&sources=bbc-news,google-news,wired,fox-news,cnn&apiKey=\(shared.APIKey2)"
-    return url
+func composedURL(request: String? = nil, pageNumber: Int? = nil, resultsForPage: Int? = nil, sources: [String]? = nil, country: String? = nil) -> String {
+    var url:String
+    defer {print("URL Created: \(url)")}
+    if let pageNumber = pageNumber, let resultsForPage = resultsForPage {
+        if let request = request {
+            if let sources = sources {
+                let stringSources = sources.joined(separator: ",")
+                 url = "https://newsapi.org/v2/everything?q=\(request)&searchIn=title&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&sources=\(stringSources)&apiKey=\(shared.APIKey2)"
+            return url
+            }
+            else if let country = country {
+                 url = "https://newsapi.org/v2/everything?q=\(request)&searchIn=title&country=\(country)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&&apiKey=\(shared.APIKey2)"
+            return url
+            }
+            else {
+                 url = "https://newsapi.org/v2/everything?q=\(request)&searchIn=title&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&&apiKey=\(shared.APIKey2)"
+            return url
+            }
+        } else {
+            if let sources = sources {
+                let stringSources = sources.joined(separator: ",")
+                 url = "https://newsapi.org/v2/top-headlines?page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&sources=\(stringSources)&apiKey=\(shared.APIKey2)"
+            return url
+            }
+            else if let country = country {
+                 url = "https://newsapi.org/v2/top-headlines?country=\(country)&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&&apiKey=\(shared.APIKey2)"
+            return url
+            }
+            else {
+                 url = "https://newsapi.org/v2/top-headlines?language=en&page=\(pageNumber)&pageSize=\(resultsForPage)&sortBy=publishedAt&&apiKey=\(shared.APIKey2)"
+            return url
+            }
+        }
+       
+    } else {
+        if let request = request {
+            if let sources = sources {
+                let stringSources = sources.joined(separator: ",")
+                 url = "https://newsapi.org/v2/everything?q=\(request)&searchIn=title&sortBy=publishedAt&sources=\(stringSources)&apiKey=\(shared.APIKey2)"
+            return url
+            }
+            else if let country = country {
+                 url = "https://newsapi.org/v2/everything?q=\(request)&searchIn=title&country=\(country)&sortBy=publishedAt&&apiKey=\(shared.APIKey2)"
+            return url
+            }
+            else {
+                 url = "https://newsapi.org/v2/everything?q=\(request)&sortBy=publishedAt&&apiKey=\(shared.APIKey2)"
+            return url
+            }
+        } else {
+            if let sources = sources {
+                let stringSources = sources.joined(separator: ",")
+                 url = "https://newsapi.org/v2/top-headlines?sortBy=publishedAt&sources=\(stringSources)&apiKey=\(shared.APIKey2)"
+            return url
+            }
+            else if let country = country {
+                 url = "https://newsapi.org/v2/top-headlines?country=\(country)&sortBy=publishedAt&&apiKey=\(shared.APIKey2)"
+            return url
+            }
+            else {
+                 url = "https://newsapi.org/v2/top-headlines?language=en&sortBy=publishedAt&&apiKey=\(shared.APIKey2)"
+            return url
+            }
+        }
+    }
+    
+   
 }
 
 //MARK: - Parsers
@@ -91,7 +163,7 @@ func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> 
     let JSONDecoder = JSONDecoder()
     let URLSession = URLSession(configuration: .default)
         
-    guard let url = URL(string: string) else {return}
+    guard let url = URL(string: string) else {print("⚠️ URL Composing Error: Unable to compose URL");return}
     let urlRequest = URLRequest(url: url)
                 
         URLSession.dataTask(with: urlRequest) { (data, response, error) in
@@ -105,8 +177,17 @@ func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> 
                     print("✅ Status:\(jsonData.status)")
                     print("✅ Total Results:\(jsonData.totalResults)")
                     
+                    let validNews = jsonData.articles.filter { article in
+                            if article.source?.name != "[Removed]" &&
+                               article.title != "[Removed]" &&
+                               article.description != "[Removed]" {
+                                return true
+                            }
+                            return false
+                        }
+                    
                     DispatchQueue.main.async {
-                        completion(jsonData.articles)
+                        completion(validNews)
                     }
                 } catch  {
                     print("⚠️ Decoding Error:\(error.localizedDescription)")

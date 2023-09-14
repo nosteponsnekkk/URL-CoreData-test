@@ -189,7 +189,9 @@ final class HomeViewController: UIViewController {
         scrollView.delegate = self
         
         DispatchQueue.main.async { [unowned self] in
-            parseNewsArticles(url: composedURL(category: "breaking", pageNumber: newsPage, resultsForPage: 10)) { articles in
+            parseNewsArticles(url: composedURL(pageNumber: self.newsPage, resultsForPage: 10,
+            sources: [shared.sources.ABCNews,shared.sources.BBC,shared.sources.Time,shared.sources.FoxNews,shared.sources.CNN,shared.sources.GoogleNews]))
+            { articles in
                 self.articles = articles
                 UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
                     self.breakingNewsCollectionView.snp.updateConstraints { make in
@@ -294,7 +296,7 @@ final class HomeViewController: UIViewController {
         }
         breakingNewsCollectionView.reloadData()
         
-            parseNewsArticles(url: composedURL(category: "breaking", pageNumber: self.newsPage, resultsForPage: 10)) { [unowned self] articles in
+            parseNewsArticles(url: composedURL(pageNumber: self.newsPage, resultsForPage: 10)) { [unowned self] articles in
                 self.articles = articles
                 
                 DispatchQueue.main.async {
