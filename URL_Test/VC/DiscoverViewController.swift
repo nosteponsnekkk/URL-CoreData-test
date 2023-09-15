@@ -13,7 +13,7 @@ final class DiscoverViewController: UIViewController {
     private var didLoadMoreNews = false
     private var newsCount = 15
     private var lastContentOffsetY: CGFloat = 0
-    private var searchContex = "news"
+    private var searchContex = ""
     
     //MARK: - Data
     private var articles = [Article]()
@@ -76,10 +76,12 @@ final class DiscoverViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if let searchQuery = (self.tabBarController as? MainTabBarController)?.searchQuery {
+            newsCount = 15
             searchTextField.text = searchQuery
             searchNews(search: searchQuery)
         } else {
-            parseNewsArticles(url: composedURL(category: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles in
+            newsCount = 15
+            parseNewsArticles(url: composedURL(pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles in
                 self.articles = articles
                 DispatchQueue.main.async {
                 self.newsCollectionView.reloadData()
@@ -114,10 +116,11 @@ final class DiscoverViewController: UIViewController {
         
     }
     private func searchNews(search: String){
+        newsCount = 15
         searchContex = search
         articles.removeAll()
         newsCollectionView.reloadData()
-            parseNewsArticles(url: composedURL(category: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles  in
+            parseNewsArticles(url: composedURL(request: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles  in
                 self.articles = articles
                 DispatchQueue.main.async {
                     self.newsCollectionView.reloadData()
@@ -159,8 +162,8 @@ extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollecti
             
         if collectionView == self.categoriesCollectionView {
             let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCell.cellID, for: indexPath) as! CategoryCell
-            let categoty = shared.categoriesArray[indexPath.item]
-            categoryCell.setType(type: categoty.type)
+            let category = shared.categoriesArray[indexPath.item]
+            categoryCell.setType(type: category.type)
             return categoryCell
         }
         return UICollectionViewCell()
@@ -179,12 +182,26 @@ extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollecti
         return CGSize()
         }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == self.newsCollectionView {
+            let vc = DetailViewController()
+            let article = articles[indexPath.item]
+            vc.setContent(author: article.source?.name ?? "Unknown", title: article.title ?? "Some title", timeStamp: article.publishedAt, imageUrl: article.urlToImage ?? "", description: article.description ?? "")
+            present(vc, animated: true)
+        } else {
+            let category = shared.categoriesArray[indexPath.item]
+            print(shared.categoriesArray)
+            searchContex = category.URLFormattedTitle
+            searchTextField.text = category.URLFormattedTitle
+            searchNews(search: category.URLFormattedTitle)
+        }
+
+    }
 
 }
 
 //MARK: - Search delegates
 extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegate {
-
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == searchTextField {
@@ -219,7 +236,7 @@ extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegat
                 newsCount += 15
 
                 ImageCacher.cacher.clearCache()
-                parseNewsArticles(url: composedURL(category: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] updatedArticles in
+                parseNewsArticles(url: composedURL(request: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] updatedArticles in
                     self.articles = updatedArticles
                     DispatchQueue.main.async {
                         self.newsCollectionView.reloadData()

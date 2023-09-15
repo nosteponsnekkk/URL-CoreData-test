@@ -21,7 +21,10 @@ public final class ImageCacher {
         
         // Creating IDs and URLs
         guard let absoluteString = NSURL(string: string)?.absoluteString else {return}
+        
+        //Checks if the connection is secure
         guard isHTTPS(urlString: absoluteString) else {return}
+        
         guard let url = URL(string: string) else {return}
         let imageID = absoluteString as NSString
         
@@ -87,7 +90,7 @@ public final class ImageCacher {
 
 //MARK: - Utility instruments
     
-func composedURL(request: String? = nil, pageNumber: Int? = nil, resultsForPage: Int? = nil, sources: [String]? = nil, country: String? = nil) -> String {
+public func composedURL(request: String? = nil, pageNumber: Int? = nil, resultsForPage: Int? = nil, sources: [String]? = nil, country: String? = nil) -> String {
     var url:String
     defer {print("URL Created: \(url)")}
     if let pageNumber = pageNumber, let resultsForPage = resultsForPage {
@@ -157,8 +160,7 @@ func composedURL(request: String? = nil, pageNumber: Int? = nil, resultsForPage:
 }
 
 //MARK: - Parsers
-
-func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> Void){
+ internal func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> Void){
     DispatchQueue.global(qos: .userInitiated).async {
     let JSONDecoder = JSONDecoder()
     let URLSession = URLSession(configuration: .default)
@@ -177,6 +179,7 @@ func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> 
                     print("✅ Status:\(jsonData.status)")
                     print("✅ Total Results:\(jsonData.totalResults)")
                     
+                    //Checks for [Removed] news
                     let validNews = jsonData.articles.filter { article in
                             if article.source?.name != "[Removed]" &&
                                article.title != "[Removed]" &&

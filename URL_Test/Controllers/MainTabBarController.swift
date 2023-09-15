@@ -36,7 +36,6 @@ class MainTabBarController: UITabBarController {
     }
 
     // MARK: - Methods
-    
     private func moveIndicator(at index: Int=0) {
         
         let itemWidth = (tabBar.bounds.width / CGFloat(tabBar.items?.count ?? 1))

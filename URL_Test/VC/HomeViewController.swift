@@ -365,6 +365,22 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
         return CGSize()
         }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == self.breakingNewsCollectionView {
+            let article = articles[indexPath.item]
+            let vc = DetailViewController()
+            vc.setContent(author: article.source?.name ?? "Unknown", title: article.title ?? "Some title", timeStamp: article.publishedAt, imageUrl: article.urlToImage ?? "", description: article.description ?? "")
+            present(vc, animated: true)
+        } else {
+            if let tabBarController = self.tabBarController as? MainTabBarController {
+            
+            tabBarController.searchQuery = shared.categoriesArray[indexPath.row].URLFormattedTitle
+            tabBarController.switchToTab(1)
+            }
+        }
+    }
+    
+   
 
 }
 

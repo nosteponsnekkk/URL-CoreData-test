@@ -19,22 +19,41 @@ extension UIColor {
 }
 
 extension Date {
-    func timeAgoDisplay(timeStamp: String) -> String{
+    func timeAgoDisplay(timeStamp: String?) -> String{
+        
+        if let timeStamp = timeStamp {
+            let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+            dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+            guard let date = dateFormatter.date(from: timeStamp) else {return "Some time ago..."}
+            
+            
+            let formatter = RelativeDateTimeFormatter()
+            formatter.locale = Locale(identifier: "en_GB")
+            
+            return formatter.localizedString(for: date, relativeTo: self)
+        }
+        
+        return "Some time ago..."
+    }
+   
+}
 
+extension String {
+    func formattedNewsDate() -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        guard let date = dateFormatter.date(from: timeStamp) else {return "Some time ago..."}
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         
+        if let date = dateFormatter.date(from: self) {
+            dateFormatter.dateFormat = "EEEE dd yyyy" 
+            return dateFormatter.string(from: date)
+        }
         
-        let formatter = RelativeDateTimeFormatter()
-        formatter.locale = Locale(identifier: "en_GB")
-        
-        return formatter.localizedString(for: date, relativeTo: self)
-
-        
+        return "Some time ago..."
     }
 }
+
 
 extension UIImage {
     func resize(to size: CGSize) -> UIImage? {
