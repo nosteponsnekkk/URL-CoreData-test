@@ -12,7 +12,7 @@ class DetailViewController: UIViewController {
     lazy private var pullBar: UILabel = {
         let pullBar = UILabel()
         pullBar.clipsToBounds = true
-        pullBar.layer.cornerRadius = pullBar.frame.height/2
+        pullBar.layer.cornerRadius = 2.5
         pullBar.backgroundColor = .lightGray
         return pullBar
     }()
@@ -64,6 +64,16 @@ class DetailViewController: UIViewController {
         sourcePageButton.layer.borderWidth = 2
         return sourcePageButton
     }()
+    private lazy var saveButton: UIButton = {
+        let saveButton = UIButton(type: .system)
+        saveButton.setImage(UIImage(named: "saved.light")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
+        saveButton.backgroundColor = .transparentWhite
+        saveButton.layer.cornerRadius = 22
+        saveButton.tintColor = .black
+        saveButton.clipsToBounds = true
+        saveButton.addTarget(self, action: #selector(saveNews), for: .touchUpInside)
+        return saveButton
+    }()
     
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -86,6 +96,7 @@ class DetailViewController: UIViewController {
         view.addSubview(imageView)
         view.addSubview(descriptionLabel)
         view.addSubview(sourcePageButton)
+        view.addSubview(saveButton)
         makeConstraints()
     }
     
@@ -97,10 +108,16 @@ class DetailViewController: UIViewController {
             make.height.equalTo(5)
             make.top.equalTo(view).offset(15)
         }
+        saveButton.snp.makeConstraints { make in
+            make.centerY.equalTo(authorLabel)
+            make.height.width.equalTo(44)
+            make.right.equalTo(view).offset(-15)
+        }
         
             authorLabel.snp.makeConstraints { make in
                 make.top.equalTo(pullBar.snp_bottomMargin).offset(35)
-            make.left.right.equalTo(view).inset(15)
+                make.left.equalTo(view).inset(15)
+                make.right.lessThanOrEqualTo(saveButton.snp_leftMargin)
         }
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(authorLabel.snp_bottomMargin).offset(30)
@@ -118,7 +135,7 @@ class DetailViewController: UIViewController {
         descriptionLabel.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp_bottomMargin).offset(15)
             make.left.right.equalTo(view).inset(15)
-            make.bottom.lessThanOrEqualTo(sourcePageButton.snp_bottomMargin)
+            make.bottom.lessThanOrEqualTo(sourcePageButton.snp_topMargin)
         }
         sourcePageButton.snp.makeConstraints { make in
             make.bottom.equalTo(view).offset(-50)
@@ -127,14 +144,21 @@ class DetailViewController: UIViewController {
         }
     }
     
+    @objc func saveNews(_ sender: UIButton){
+        sender.setImage(UIImage(named: "saved")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
+        sender.tintColor = .primary
+    }
+    
     public func setContent(author: String, title: String, timeStamp: String?, imageUrl: String, description: String){
+        
         let attributedText = NSMutableAttributedString(string: "posted by \(author)")
         attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.lightGray, NSAttributedString.Key.font : UIFont.systemFont(ofSize: 20)], range: NSRange(location: 0, length: 10))
         attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.black, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 20)], range: NSRange(location: 10, length: author.count))
         authorLabel.attributedText = attributedText
+        
         titleLabel.text = title
         dateLabel.text = timeStamp?.formattedNewsDate()
-        descriptionLabel.text = description
+        descriptionLabel.text = !description.isEmpty ? description : "To see full description go to the source page"
         ImageCacher.cacher.urlToImage(url: imageUrl) { image in
             DispatchQueue.main.async{ [unowned self] in
                 self.imageView.image = image

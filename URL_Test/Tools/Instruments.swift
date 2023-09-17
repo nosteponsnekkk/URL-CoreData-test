@@ -23,9 +23,9 @@ public final class ImageCacher {
         guard let absoluteString = NSURL(string: string)?.absoluteString else {return}
         
         //Checks if the connection is secure
-        guard isHTTPS(urlString: absoluteString) else {return}
+        guard isHTTPS(urlString: absoluteString) else {completion(UIImage(named: "noImageFound"));return}
         
-        guard let url = URL(string: string) else {return}
+        guard let url = URL(string: string) else {completion(UIImage(named: "noImageFound"));return}
         let imageID = absoluteString as NSString
         
 

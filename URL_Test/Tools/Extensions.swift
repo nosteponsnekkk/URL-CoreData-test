@@ -16,6 +16,7 @@ extension UIColor {
     static let transparentWhite = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 0.2005309021)
     static let lightLightGray = #colorLiteral(red: 0.8000000119, green: 0.8000000119, blue: 0.8000000119, alpha: 1)
     static let sand = #colorLiteral(red: 0.937254902, green: 0.937254902, blue: 0.9215686275, alpha: 1)
+    static let mainRed = #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)
 }
 
 extension Date {

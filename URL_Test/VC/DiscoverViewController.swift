@@ -235,8 +235,8 @@ extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegat
 
                 newsCount += 15
 
-                ImageCacher.cacher.clearCache()
-                parseNewsArticles(url: composedURL(request: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] updatedArticles in
+              
+                parseNewsArticles(url: composedURL(request: !searchContex.isEmpty ? searchContex : nil, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] updatedArticles in
                     self.articles = updatedArticles
                     DispatchQueue.main.async {
                         self.newsCollectionView.reloadData()
