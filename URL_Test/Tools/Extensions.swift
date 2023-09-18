@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+//MARK: - UI Colors
 extension UIColor {
     static let primary = #colorLiteral(red: 0.1066659316, green: 0.1317585111, blue: 0.1881643832, alpha: 1)
     static let grayYellow = #colorLiteral(red: 0.9499329925, green: 0.9495629668, blue: 0.9372775555, alpha: 1)
@@ -19,6 +20,7 @@ extension UIColor {
     static let mainRed = #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)
 }
 
+//MARK: - Date-Tools extensions
 extension Date {
     func timeAgoDisplay(timeStamp: String?) -> String{
         
@@ -39,7 +41,6 @@ extension Date {
     }
    
 }
-
 extension String {
     func formattedNewsDate() -> String {
         let dateFormatter = DateFormatter()
@@ -55,7 +56,7 @@ extension String {
     }
 }
 
-
+//MARK: - Image-Resizer
 extension UIImage {
     func resize(to size: CGSize) -> UIImage? {
         UIGraphicsBeginImageContextWithOptions(size, false, 0.0)

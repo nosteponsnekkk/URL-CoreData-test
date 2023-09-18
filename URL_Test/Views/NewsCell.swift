@@ -116,7 +116,7 @@ class NewsCell: UICollectionViewCell {
     
     //MARK: - Interfaces
     
-    public func setContent(imageURL: String?, title: String?, timeStamp: String?, author name: String?){
+    public func setContent(imageURL: String? = nil, title: String?, timeStamp: String?, author name: String?, imageData: Data? = nil){
         if let timeStamp = timeStamp {
             dateLabel.text = "🕒 \(Date().timeAgoDisplay(timeStamp: timeStamp))"
         }
@@ -124,6 +124,13 @@ class NewsCell: UICollectionViewCell {
         authorLabel.text = "by \(name ?? "Unknown")"
         
         titleLabel.text = title
+        
+        if let imageData = imageData {
+            DispatchQueue.main.async { [unowned self] in
+                self.imageView.image = UIImage(data: imageData)
+                self.activityIndicator.removeFromSuperview()
+            }
+        }
         
             if let imageURL = imageURL {
                 ImageCacher.cacher.urlToImage(url: imageURL) { image in

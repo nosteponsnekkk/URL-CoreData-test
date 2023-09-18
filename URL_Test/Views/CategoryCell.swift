@@ -56,6 +56,8 @@ class CategoryCell: UICollectionViewCell {
                 make.bottom.lessThanOrEqualTo(self).inset(10) 
             }
     }
+    
+    //MARK: - Interface
     public func setType(type: CategoryModel.Category){
         
         for category in shared.categoriesArray {

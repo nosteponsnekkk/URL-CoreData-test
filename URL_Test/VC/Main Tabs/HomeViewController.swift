@@ -369,7 +369,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
         if collectionView == self.breakingNewsCollectionView {
             let article = articles[indexPath.item]
             let vc = DetailViewController()
-            vc.setContent(author: article.source?.name ?? "Unknown", title: article.title ?? "Some title", timeStamp: article.publishedAt, imageUrl: article.urlToImage ?? "", description: article.description ?? "")
+            vc.setContent(author: article.source?.name ?? "Unknown", title: article.title ?? "Some title", timeStamp: article.publishedAt, url: article.url, imageUrl: article.urlToImage ?? "", description: article.description ?? "")
             present(vc, animated: true)
         } else {
             if let tabBarController = self.tabBarController as? MainTabBarController {

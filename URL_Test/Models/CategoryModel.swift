@@ -7,9 +7,10 @@
 
 import Foundation
 
+//MARK: - CategoryModel
 
 struct CategoryModel {
-    
+    // Enum for choosing categories
     enum Category {
         case business
         case sports
@@ -17,7 +18,7 @@ struct CategoryModel {
         case politics
         case technology
     }
-    
+    // Properties
     let title: String
     let URLFormattedTitle: String
     let type: Category

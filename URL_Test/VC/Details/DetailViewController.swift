@@ -7,8 +7,12 @@
 
 import UIKit
 
-class DetailViewController: UIViewController {
+final class DetailViewController: UIViewController {
     
+    //MARK: - Data var
+    var currentArticle: Article!
+    
+    //MARK: - UI elements
     lazy private var pullBar: UILabel = {
         let pullBar = UILabel()
         pullBar.clipsToBounds = true
@@ -64,7 +68,7 @@ class DetailViewController: UIViewController {
         sourcePageButton.layer.borderWidth = 2
         return sourcePageButton
     }()
-    private lazy var saveButton: UIButton = {
+    lazy private var saveButton: UIButton = {
         let saveButton = UIButton(type: .system)
         saveButton.setImage(UIImage(named: "saved.light")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
         saveButton.backgroundColor = .transparentWhite
@@ -72,18 +76,11 @@ class DetailViewController: UIViewController {
         saveButton.tintColor = .black
         saveButton.clipsToBounds = true
         saveButton.addTarget(self, action: #selector(saveNews), for: .touchUpInside)
+        saveButton.isEnabled = false
         return saveButton
     }()
     
-    init() {
-        super.init(nibName: nil, bundle: nil)
-        
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
+    //MARK: - ViewController lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -100,6 +97,7 @@ class DetailViewController: UIViewController {
         makeConstraints()
     }
     
+    //MARK: - Methods
     private func makeConstraints(){
         
         pullBar.snp.makeConstraints { make in
@@ -114,10 +112,10 @@ class DetailViewController: UIViewController {
             make.right.equalTo(view).offset(-15)
         }
         
-            authorLabel.snp.makeConstraints { make in
-                make.top.equalTo(pullBar.snp_bottomMargin).offset(35)
-                make.left.equalTo(view).inset(15)
-                make.right.lessThanOrEqualTo(saveButton.snp_leftMargin)
+        authorLabel.snp.makeConstraints { make in
+            make.top.equalTo(pullBar.snp_bottomMargin).offset(35)
+            make.left.equalTo(view).inset(15)
+            make.right.lessThanOrEqualTo(saveButton.snp_leftMargin)
         }
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(authorLabel.snp_bottomMargin).offset(30)
@@ -143,13 +141,14 @@ class DetailViewController: UIViewController {
             make.height.equalTo(sourcePageButton.snp.width).dividedBy(4)
         }
     }
-    
-    @objc func saveNews(_ sender: UIButton){
+    @objc private func saveNews(_ sender: UIButton){
         sender.setImage(UIImage(named: "saved")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
         sender.tintColor = .primary
+        CoreDataManager.shared.createNews(title: currentArticle.title, descriptionText: currentArticle.description, timestamp: currentArticle.publishedAt, sourceURL: currentArticle.url, author: currentArticle.author, imageData: currentArticle.imageData)
     }
     
-    public func setContent(author: String, title: String, timeStamp: String?, imageUrl: String, description: String){
+    //MARK: - Interface
+    public func setContent(author: String, title: String, timeStamp: String?, url: String?, imageUrl: String? = nil, description: String, imageData: Data? = nil){
         
         let attributedText = NSMutableAttributedString(string: "posted by \(author)")
         attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.lightGray, NSAttributedString.Key.font : UIFont.systemFont(ofSize: 20)], range: NSRange(location: 0, length: 10))
@@ -159,11 +158,25 @@ class DetailViewController: UIViewController {
         titleLabel.text = title
         dateLabel.text = timeStamp?.formattedNewsDate()
         descriptionLabel.text = !description.isEmpty ? description : "To see full description go to the source page"
-        ImageCacher.cacher.urlToImage(url: imageUrl) { image in
-            DispatchQueue.main.async{ [unowned self] in
-                self.imageView.image = image
+        if let imageUrl = imageUrl {
+            ImageCacher.cacher.urlToImage(url: imageUrl) { [unowned self] image in
+                
+                self.currentArticle = Article(author: author, title: title, description: !description.isEmpty ? description : "To see full description go to the source page", publishedAt: timeStamp, url: url, imageData: image?.pngData())
+                
+                DispatchQueue.main.async{
+                    self.imageView.image = image
+                    saveButton.isEnabled = true
+                }
+                
             }
-            
+        } else if let imageData = imageData {
+            DispatchQueue.main.async{ [unowned self] in
+                self.imageView.image = UIImage(data: imageData)
+                self.saveButton.setImage(UIImage(named: "saved")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
+                self.saveButton.tintColor = .primary
+                self.saveButton.isEnabled = true
+            }
         }
+        
     }
 }
