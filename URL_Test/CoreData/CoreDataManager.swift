@@ -4,117 +4,149 @@
 //
 //  Created by Олег Наливайко on 17.09.2023.
 //
-
 import Foundation
-import UIKit
 import CoreData
 
-//MARK: - CRUD
-
-public final class CoreDataManager: NSObject {
-    //Signletone
+public final class CoreDataManager {
+    // Singleton
     public static let shared = CoreDataManager()
-    private override init(){}
-    
-    public func logCoreData(){
-        if let url = appDelegate.persistentContainer.persistentStoreCoordinator.persistentStores.first?.url {
-            print("✅ CoreData DB URL:\(url.absoluteString)")
+    private init() {}
 
+    // Reference to the main managed object context
+    private lazy var mainContext: NSManagedObjectContext = {
+        return persistentContainer.viewContext
+    }()
+
+    // Background managed object context for performing asynchronous operations
+    private lazy var backgroundContext: NSManagedObjectContext = {
+        return persistentContainer.newBackgroundContext()
+    }()
+
+    // Persistent container
+    private lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: Constants.dataBaseName)
+        container.loadPersistentStores { (_, error) in
+            if let error = error {
+                fatalError("Unresolved error \(error)")
+            }
+        }
+        return container
+    }()
+
+    // MARK: - CRUD
+
+    public func logCoreData() {
+        if let url = persistentContainer.persistentStoreCoordinator.persistentStores.first?.url {
+            print("✅ CoreData DB URL:\(url.absoluteString)")
         }
     }
-    
-    //AppDelegate reference
-    private var appDelegate: AppDelegate {
-        UIApplication.shared.delegate as! AppDelegate
+
+    // Create asynchronously
+    public func createNews(title: String?, descriptionText: String?, timestamp: String?, sourceURL: String?, author: String?, imageData: Data?) {
+        backgroundContext.perform {
+            guard let newsEntityDescription = NSEntityDescription.entity(forEntityName: Constants.newsEntityName, in: self.backgroundContext) else {
+                print("⚠️ CoreData Error: Couldn't create entity: newsEntity")
+                return
+            }
+            let newsEntity = NewsCDEntity(entity: newsEntityDescription, insertInto: self.backgroundContext)
+            newsEntity.title = title
+            newsEntity.descriptionText = descriptionText
+            newsEntity.timestamp = timestamp
+            newsEntity.sourceURL = sourceURL
+            newsEntity.author = author
+            newsEntity.imageData = imageData
+
+            self.saveBackgroundContext()
+        }
     }
-    
-    //CoreData contex
-    private var context: NSManagedObjectContext {
-        appDelegate.persistentContainer.viewContext
+
+    // Fetch asynchronously
+    public func fetchAllNews(completion: @escaping ([NewsCDEntity]) -> Void) {
+        backgroundContext.perform {
+            let fetchRequest = NSFetchRequest<NewsCDEntity>(entityName: Constants.newsEntityName)
+            do {
+                let news = try self.backgroundContext.fetch(fetchRequest)
+                DispatchQueue.main.async {
+                    completion(news)
+                }
+            } catch {
+                print("⚠️ CoreData Error: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    completion([])
+                }
+            }
+        }
     }
-    //MARK: - Interfaces
-    
-    //Create
-    public func createNews(title: String?, descriptionText: String?, timestamp: String?, sourceURL: String?, author: String?, imageData: Data?){
-        
-        guard let newsEntityDescription = NSEntityDescription.entity(forEntityName: CoreDataManager.Constants.newsEntityName, in: context) else {print("⚠️ CoreData Error: Couldn't create entity: newsEntity");return}
-        let newsEntity = NewsCDEntity(entity: newsEntityDescription, insertInto: context)
-        newsEntity.title = title
-        newsEntity.descriptionText = descriptionText
-        newsEntity.timestamp = timestamp
-        newsEntity.sourceURL = sourceURL
-        newsEntity.author = author
-        newsEntity.imageData = imageData
-        appDelegate.saveContext()
+
+    // Update asynchronously
+    public func updateNews(title: String?, descriptionText: String?, timestamp: String?, sourceURL: String?, author: String?) {
+        backgroundContext.perform {
+            let fetchRequest = NSFetchRequest<NewsCDEntity>(entityName: Constants.newsEntityName)
+            do {
+                if let updatedNews = try self.backgroundContext.fetch(fetchRequest).first(where: { $0.title == title }) {
+                    updatedNews.title = title
+                    updatedNews.descriptionText = descriptionText
+                    updatedNews.timestamp = timestamp
+                    updatedNews.sourceURL = sourceURL
+                    updatedNews.author = author
+                    self.saveBackgroundContext()
+                }
+            } catch {
+                print("⚠️ CoreData Error: \(error.localizedDescription)")
+            }
+        }
     }
-    
-    //Read
-    public func fetchAllNews() -> [NewsCDEntity] {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: CoreDataManager.Constants.newsEntityName)
+
+    // Delete asynchronously
+    public func deleteAllNews() {
+        backgroundContext.perform {
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Constants.newsEntityName)
+            do {
+                if let result = try self.backgroundContext.fetch(fetchRequest) as? [NewsCDEntity] {
+                    result.forEach { self.backgroundContext.delete($0) }
+                    self.saveBackgroundContext()
+                }
+            } catch {
+                print("⚠️ CoreData Error: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    public func deleteNewsByTitle(_ title: String) {
+        backgroundContext.perform {
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Constants.newsEntityName)
+            do {
+                if let result = try self.backgroundContext.fetch(fetchRequest) as? [NewsCDEntity],
+                    let news = result.first(where: { $0.title == title }) {
+                    self.backgroundContext.delete(news)
+                    self.saveBackgroundContext()
+                }
+            } catch {
+                print("⚠️ CoreData Error: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // Save changes on the background context and propagate to the main context
+    private func saveBackgroundContext() {
         do {
-            return try context.fetch(fetchRequest) as! [NewsCDEntity]
+            try backgroundContext.save()
+            mainContext.performAndWait {
+                do {
+                    try mainContext.save()
+                } catch {
+                    print("⚠️ CoreData Error: \(error.localizedDescription)")
+                }
+            }
         } catch {
             print("⚠️ CoreData Error: \(error.localizedDescription)")
         }
-        return []
     }
-    public func fetchNews(_ title: String) -> NewsCDEntity?{
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: CoreDataManager.Constants.newsEntityName)
-        do {
-            guard let news = try context.fetch(fetchRequest) as? [NewsCDEntity] else{return nil}
-            return news.first(where: {$0.title == title})
-        } catch  {
-            print("⚠️ CoreData Error: \(error.localizedDescription)")
-        }
-        return nil
-    }
-    
-    //Update
-    public func updateNews(title: String?, descriptionText: String?, timestamp: String?, sourceURL: String?, author: String?){
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: CoreDataManager.Constants.newsEntityName)
-        do {
-            guard let news = try context.fetch(fetchRequest) as? [NewsCDEntity], let updatedNews = news.first(where: {$0.title == title}) else{return}
-            updatedNews.title = title
-            updatedNews.descriptionText = descriptionText
-            updatedNews.timestamp = timestamp
-            updatedNews.sourceURL = sourceURL
-            updatedNews.author = author
-        } catch  {
-            print("⚠️ CoreData Error: \(error.localizedDescription)")
-        }
-        appDelegate.saveContext()
-    }
-    
-    //Delete
-    public func deleteAllNews(){
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: CoreDataManager.Constants.newsEntityName)
-        do {
-            let result = try context.fetch(fetchRequest) as? [NewsCDEntity]
-            result?.forEach{ context.delete($0) }
-        } catch  {
-            print("⚠️ CoreData Error: \(error.localizedDescription)")
-        }
-        appDelegate.saveContext()
-    }
-    public func deleteNewsByTitle(_ title: String){
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: CoreDataManager.Constants.newsEntityName)
-        do {
-            guard let result = try context.fetch(fetchRequest) as? [NewsCDEntity],
-                  let news = result.first(where: {$0.title == title}) else {return}
-            context.delete(news)
-        } catch  {
-            print("⚠️ CoreData Error: \(error.localizedDescription)")
-        }
-        appDelegate.saveContext()
-    }
-    
-    //Constants
+
+    // Constants
     public struct Constants {
         static let dataBaseName = "NewsFeedCoreData"
         static let newsEntityName = "NewsCDEntity"
     }
-
 }
-
-
 

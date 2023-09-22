@@ -36,6 +36,14 @@ final class SavedViewController: UIViewController {
         newsCollectionView.contentInset = UIEdgeInsets(top: 5, left: 5, bottom: 15, right: 5)
         return newsCollectionView
     }()
+    private lazy var clearSavedNewsButton: UIButton = {
+        let clearSavedNewsButton = UIButton(type: .system)
+        clearSavedNewsButton.setImage(UIImage(systemName: "trash"), for: .normal)
+        clearSavedNewsButton.tintColor = .white
+        clearSavedNewsButton.addTarget(self, action: #selector(clearSavedNews), for: .touchUpInside)
+        clearSavedNewsButton.isEnabled = false
+        return clearSavedNewsButton
+    }()
     
     //MARK: - ViewController Life Cycle
     override func viewDidLoad() {
@@ -44,6 +52,7 @@ final class SavedViewController: UIViewController {
         view.backgroundColor = .primary
         view.addSubview(titleLabel)
         view.addSubview(newsCollectionView)
+        view.addSubview(clearSavedNewsButton)
         
         makeConstraints()
         
@@ -51,14 +60,23 @@ final class SavedViewController: UIViewController {
         newsCollectionView.delegate = self
         newsCollectionView.dataSource = self
     }
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        castSavedNewsArray()
+        CoreDataManager.shared.fetchAllNews { [unowned self] entities in
+            self.articles.removeAll()
+            for entity in entities {
+                self.articles.append(Article(author: entity.author, title: entity.title, description: entity.descriptionText, publishedAt: entity.timestamp, url: entity.sourceURL, imageData: entity.imageData))
+            }
+            DispatchQueue.main.async {
+                self.newsCollectionView.reloadData()
+                self.clearSavedNewsButton.isEnabled = true
+            }
+        }
     }
-    
-    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        clearSavedNewsButton.isEnabled = false
+    }
     //MARK: - Other Methods
     private func makeConstraints(){
         
@@ -69,18 +87,27 @@ final class SavedViewController: UIViewController {
             make.top.equalTo(margins).offset(15)
             
         }
+        clearSavedNewsButton.snp.makeConstraints { make in
+            make.left.top.equalTo(margins).offset(15)
+        }
         newsCollectionView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp_bottomMargin).offset(15)
             make.right.left.bottom.equalTo(margins)
         }
         
     }
-    private func castSavedNewsArray(){
-        let entities = CoreDataManager.shared.fetchAllNews()
-        for entity in entities {
-            let article = Article(author: entity.author, title: entity.title, description: entity.descriptionText, publishedAt: entity.timestamp, url: entity.sourceURL, imageData: entity.imageData)
-            articles.append(article)
-        }
+    @objc private func clearSavedNews(){
+        let ac = UIAlertController(title: "Do you want to remove all saved articles?", message: "Press clear to delete every article", preferredStyle: .alert)
+        ac.view.tintColor = .primary
+        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        ac.addAction(UIAlertAction(title: "Clear", style: .default, handler: { [unowned self] _ in
+            self.articles.removeAll()
+            CoreDataManager.shared.deleteAllNews()
+            DispatchQueue.main.async {
+                self.newsCollectionView.reloadData()
+            }
+        }))
+        present(ac, animated: true)
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -123,9 +150,3 @@ extension SavedViewController: UICollectionViewDelegateFlowLayout, UICollectionV
         }
 
     }
-
-
-
-
-
-  

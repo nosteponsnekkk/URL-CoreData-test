@@ -173,4 +173,5 @@ class NewsCell: UICollectionViewCell {
         }
         
     }
+    
 }
