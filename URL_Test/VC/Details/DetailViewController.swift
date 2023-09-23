@@ -68,15 +68,9 @@ final class DetailViewController: UIViewController {
         sourcePageButton.layer.borderWidth = 2
         return sourcePageButton
     }()
-    lazy private var saveButton: UIButton = {
-        let saveButton = UIButton(type: .system)
-        saveButton.setImage(UIImage(named: "saved.light")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
-        saveButton.backgroundColor = .transparentWhite
-        saveButton.layer.cornerRadius = 22
-        saveButton.tintColor = .black
-        saveButton.clipsToBounds = true
+    lazy private var saveButton: SaveButton = {
+        let saveButton = SaveButton()
         saveButton.addTarget(self, action: #selector(saveNews), for: .touchUpInside)
-        saveButton.isEnabled = false
         return saveButton
     }()
     
@@ -95,6 +89,7 @@ final class DetailViewController: UIViewController {
         view.addSubview(sourcePageButton)
         view.addSubview(saveButton)
         makeConstraints()
+        
     }
     
     //MARK: - Methods
@@ -141,14 +136,26 @@ final class DetailViewController: UIViewController {
             make.height.equalTo(sourcePageButton.snp.width).dividedBy(4)
         }
     }
-    @objc private func saveNews(_ sender: UIButton){
-        sender.setImage(UIImage(named: "saved")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
-        sender.tintColor = .primary
-        CoreDataManager.shared.createNews(title: currentArticle.title, descriptionText: currentArticle.description, timestamp: currentArticle.publishedAt, sourceURL: currentArticle.url, author: currentArticle.author, imageData: currentArticle.imageData)
+    @objc private func saveNews(_ sender: SaveButton){
+        if sender.isSaved {
+            guard let articleTitle = currentArticle.title else {return}
+                CoreDataManager.shared.deleteNewsByTitle(articleTitle)
+                NotificationCenter.default.post(name: Notification.Name("DetailDidRemoveArticle"), object: nil)
+                dismiss(animated: true)
+                
+        } else {
+            CoreDataManager.shared.createNews(title: currentArticle.title, descriptionText: currentArticle.description, timestamp: currentArticle.publishedAt, sourceURL: currentArticle.url, author: currentArticle.author, imageData: currentArticle.imageData)
+            if let articleTitle = currentArticle.title {
+                saveButton.checkIsSaved(articleTitle)
+            }
+        }
+      
     }
     
     //MARK: - Interface
     public func setContent(author: String, title: String, timeStamp: String?, url: String?, imageUrl: String? = nil, description: String, imageData: Data? = nil){
+        
+        saveButton.checkIsSaved(title)
         
         let attributedText = NSMutableAttributedString(string: "posted by \(author)")
         attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.lightGray, NSAttributedString.Key.font : UIFont.systemFont(ofSize: 20)], range: NSRange(location: 0, length: 10))
@@ -157,6 +164,7 @@ final class DetailViewController: UIViewController {
         
         titleLabel.text = title
         dateLabel.text = timeStamp?.formattedNewsDate()
+        
         descriptionLabel.text = !description.isEmpty ? description : "To see full description go to the source page"
         if let imageUrl = imageUrl {
             ImageCacher.cacher.urlToImage(url: imageUrl) { [unowned self] image in
@@ -170,6 +178,9 @@ final class DetailViewController: UIViewController {
                 
             }
         } else if let imageData = imageData {
+            
+            self.currentArticle = Article(author: author, title: title, description: !description.isEmpty ? description : "To see full description go to the source page", publishedAt: timeStamp, url: url, imageData: imageData)
+            
             DispatchQueue.main.async{ [unowned self] in
                 self.imageView.image = UIImage(data: imageData)
                 self.saveButton.setImage(UIImage(named: "saved")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)

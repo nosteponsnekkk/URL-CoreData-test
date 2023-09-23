@@ -59,24 +59,22 @@ final class SavedViewController: UIViewController {
         newsCollectionView.register(NewsCell.self, forCellWithReuseIdentifier: NewsCell.cellID)
         newsCollectionView.delegate = self
         newsCollectionView.dataSource = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadCollectionViewData), name: Notification.Name("DetailDidRemoveArticle"), object: nil)
+
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        CoreDataManager.shared.fetchAllNews { [unowned self] entities in
-            self.articles.removeAll()
-            for entity in entities {
-                self.articles.append(Article(author: entity.author, title: entity.title, description: entity.descriptionText, publishedAt: entity.timestamp, url: entity.sourceURL, imageData: entity.imageData))
-            }
-            DispatchQueue.main.async {
-                self.newsCollectionView.reloadData()
-                self.clearSavedNewsButton.isEnabled = true
-            }
-        }
+        fetchNews()
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         clearSavedNewsButton.isEnabled = false
     }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     //MARK: - Other Methods
     private func makeConstraints(){
         
@@ -96,6 +94,18 @@ final class SavedViewController: UIViewController {
         }
         
     }
+    private func fetchNews(){
+        CoreDataManager.shared.fetchAllNews { [unowned self] entities in
+            self.articles.removeAll()
+            for entity in entities {
+                self.articles.append(Article(author: entity.author, title: entity.title, description: entity.descriptionText, publishedAt: entity.timestamp, url: entity.sourceURL, imageData: entity.imageData))
+            }
+            DispatchQueue.main.async {
+                self.newsCollectionView.reloadData()
+                self.clearSavedNewsButton.isEnabled = true
+            }
+        }
+    }
     @objc private func clearSavedNews(){
         let ac = UIAlertController(title: "Do you want to remove all saved articles?", message: "Press clear to delete every article", preferredStyle: .alert)
         ac.view.tintColor = .primary
@@ -109,7 +119,10 @@ final class SavedViewController: UIViewController {
         }))
         present(ac, animated: true)
     }
-    
+    @objc private func reloadCollectionViewData() {
+        fetchNews()
+    }
+
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }

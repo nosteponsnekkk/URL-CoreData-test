@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7C5B54352ABF674000CA03C7 /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5B54342ABF674000CA03C7 /* SaveButton.swift */; };
 		7C6590C52AAE29BF00CF9EFA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590C42AAE29BF00CF9EFA /* AppDelegate.swift */; };
 		7C6590C72AAE29BF00CF9EFA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590C62AAE29BF00CF9EFA /* SceneDelegate.swift */; };
 		7C6590CE2AAE29C300CF9EFA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7C6590CD2AAE29C300CF9EFA /* Assets.xcassets */; };
@@ -33,6 +34,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7C5B54342ABF674000CA03C7 /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		7C6590C12AAE29BF00CF9EFA /* URL_Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = URL_Test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C6590C42AAE29BF00CF9EFA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7C6590C62AAE29BF00CF9EFA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 			isa = PBXGroup;
 			children = (
 				7C6590EA2AAF378B00CF9EFA /* MainTabBarController.swift */,
+				7C5B54342ABF674000CA03C7 /* SaveButton.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 				7CEF5FFE2AB8B10D004F199A /* NewsCDEntity+CoreDataClass.swift in Sources */,
 				7CEF5FE82AB50216004F199A /* SourceViewController.swift in Sources */,
 				7CEF5FF72AB78BDD004F199A /* CoreDataManager.swift in Sources */,
+				7C5B54352ABF674000CA03C7 /* SaveButton.swift in Sources */,
 				7C6590F12AAF432700CF9EFA /* SavedViewController.swift in Sources */,
 				7C6590EB2AAF378C00CF9EFA /* MainTabBarController.swift in Sources */,
 				7C6590F92AAF607700CF9EFA /* Constants.swift in Sources */,

@@ -34,13 +34,7 @@ public final class CoreDataManager {
     }()
 
     // MARK: - CRUD
-
-    public func logCoreData() {
-        if let url = persistentContainer.persistentStoreCoordinator.persistentStores.first?.url {
-            print("✅ CoreData DB URL:\(url.absoluteString)")
-        }
-    }
-
+    
     // Create asynchronously
     public func createNews(title: String?, descriptionText: String?, timestamp: String?, sourceURL: String?, author: String?, imageData: Data?) {
         backgroundContext.perform {
@@ -143,7 +137,27 @@ public final class CoreDataManager {
         }
     }
 
-    // Constants
+    //MARK: - Other methods
+    
+    public func checkIsArticleSaved(_ title: String, completion: @escaping (Bool) -> Void) {
+        backgroundContext.perform {
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Constants.newsEntityName)
+            
+            do {
+                if let result = try self.backgroundContext.fetch(fetchRequest) as? [NewsCDEntity],
+                  result.first(where: { $0.title == title }) != nil {
+                    completion(true)
+                } else {
+                    completion(false)
+                }
+            } catch  {
+                print("⚠️ CoreData Error: \(error.localizedDescription)")
+            }
+            
+        }
+    }
+    
+    // MARK: - Constants
     public struct Constants {
         static let dataBaseName = "NewsFeedCoreData"
         static let newsEntityName = "NewsCDEntity"
