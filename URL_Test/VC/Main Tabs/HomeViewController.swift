@@ -370,7 +370,7 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             let article = articles[indexPath.item]
             let vc = DetailViewController()
             vc.setContent(author: article.source?.name ?? "Unknown", title: article.title ?? "Some title", timeStamp: article.publishedAt, url: article.url, imageUrl: article.urlToImage ?? "", description: article.description ?? "")
-            present(vc, animated: true)
+            navigationController?.pushViewController(vc, animated: true)
         } else {
             if let tabBarController = self.tabBarController as? MainTabBarController {
             

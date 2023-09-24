@@ -101,7 +101,6 @@ class MainTabBarController: UITabBarController {
     
     //MARK: - Interface
     public var searchQuery: String?
-    
     public func switchToTab(_ tabIndex: Int) {
             moveIndicator(at: tabIndex)
             selectedIndex = tabIndex

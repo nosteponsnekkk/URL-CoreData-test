@@ -36,7 +36,7 @@ public final class CoreDataManager {
     // MARK: - CRUD
     
     // Create asynchronously
-    public func createNews(title: String?, descriptionText: String?, timestamp: String?, sourceURL: String?, author: String?, imageData: Data?) {
+    public func createNews(title: String?, descriptionText: String?, timestamp: String?, sourceURL: String?, author: String?, imageData: Data?, htmlData: String?) {
         backgroundContext.perform {
             guard let newsEntityDescription = NSEntityDescription.entity(forEntityName: Constants.newsEntityName, in: self.backgroundContext) else {
                 print("⚠️ CoreData Error: Couldn't create entity: newsEntity")
@@ -49,6 +49,7 @@ public final class CoreDataManager {
             newsEntity.sourceURL = sourceURL
             newsEntity.author = author
             newsEntity.imageData = imageData
+            newsEntity.htmlData = htmlData
 
             self.saveBackgroundContext()
         }
@@ -67,6 +68,26 @@ public final class CoreDataManager {
                 print("⚠️ CoreData Error: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     completion([])
+                }
+            }
+        }
+    }
+    public func fetchHTMLData(url: String, completion: @escaping (String?) -> Void){
+        backgroundContext.perform {
+            let fetchRequest = NSFetchRequest<NewsCDEntity>(entityName: Constants.newsEntityName)
+            do {
+                 let result = try self.backgroundContext.fetch(fetchRequest)
+                   if let article = result.first(where: { $0.sourceURL == url }) {
+                    DispatchQueue.main.async {
+                        completion(article.htmlData)
+                    }
+                } else {
+                    completion(nil)
+                }
+            } catch  {
+                print("⚠️ CoreData Error: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    completion(nil)
                 }
             }
         }
@@ -105,7 +126,6 @@ public final class CoreDataManager {
             }
         }
     }
-
     public func deleteNewsByTitle(_ title: String) {
         backgroundContext.perform {
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Constants.newsEntityName)
@@ -138,7 +158,6 @@ public final class CoreDataManager {
     }
 
     //MARK: - Other methods
-    
     public func checkIsArticleSaved(_ title: String, completion: @escaping (Bool) -> Void) {
         backgroundContext.perform {
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Constants.newsEntityName)

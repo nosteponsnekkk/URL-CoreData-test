@@ -159,7 +159,7 @@ extension SavedViewController: UICollectionViewDelegateFlowLayout, UICollectionV
             let vc = DetailViewController()
             let article = articles[indexPath.item]
         vc.setContent(author: article.author ?? "Unknown", title: article.title ?? "Some title", timeStamp: article.publishedAt, url: article.url ?? "", description: article.description ?? "", imageData: article.imageData)
-            present(vc, animated: true)
+        navigationController?.pushViewController(vc, animated: true)
         }
 
     }

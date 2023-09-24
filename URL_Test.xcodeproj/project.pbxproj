@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		7C5B54352ABF674000CA03C7 /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5B54342ABF674000CA03C7 /* SaveButton.swift */; };
+		7C5B543A2AC0A80E00CA03C7 /* NewsCDEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5B54382AC0A80E00CA03C7 /* NewsCDEntity+CoreDataClass.swift */; };
+		7C5B543B2AC0A80E00CA03C7 /* NewsCDEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5B54392AC0A80E00CA03C7 /* NewsCDEntity+CoreDataProperties.swift */; };
 		7C6590C52AAE29BF00CF9EFA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590C42AAE29BF00CF9EFA /* AppDelegate.swift */; };
 		7C6590C72AAE29BF00CF9EFA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6590C62AAE29BF00CF9EFA /* SceneDelegate.swift */; };
 		7C6590CE2AAE29C300CF9EFA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7C6590CD2AAE29C300CF9EFA /* Assets.xcassets */; };
@@ -29,12 +31,12 @@
 		7CEF5FE82AB50216004F199A /* SourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEF5FE72AB50216004F199A /* SourceViewController.swift */; };
 		7CEF5FF02AB786D9004F199A /* NewsFeedCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7CEF5FEE2AB786D9004F199A /* NewsFeedCoreData.xcdatamodeld */; };
 		7CEF5FF72AB78BDD004F199A /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEF5FF62AB78BDD004F199A /* CoreDataManager.swift */; };
-		7CEF5FFE2AB8B10D004F199A /* NewsCDEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEF5FFC2AB8B10C004F199A /* NewsCDEntity+CoreDataClass.swift */; };
-		7CEF5FFF2AB8B10D004F199A /* NewsCDEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEF5FFD2AB8B10D004F199A /* NewsCDEntity+CoreDataProperties.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		7C5B54342ABF674000CA03C7 /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
+		7C5B54382AC0A80E00CA03C7 /* NewsCDEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewsCDEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
+		7C5B54392AC0A80E00CA03C7 /* NewsCDEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewsCDEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		7C6590C12AAE29BF00CF9EFA /* URL_Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = URL_Test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C6590C42AAE29BF00CF9EFA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7C6590C62AAE29BF00CF9EFA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -57,8 +59,6 @@
 		7CEF5FE72AB50216004F199A /* SourceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceViewController.swift; sourceTree = "<group>"; };
 		7CEF5FEF2AB786D9004F199A /* NewsFeedCoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NewsFeedCoreData.xcdatamodel; sourceTree = "<group>"; };
 		7CEF5FF62AB78BDD004F199A /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
-		7CEF5FFC2AB8B10C004F199A /* NewsCDEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewsCDEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
-		7CEF5FFD2AB8B10D004F199A /* NewsCDEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewsCDEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,8 +202,8 @@
 			children = (
 				7CEF5FF62AB78BDD004F199A /* CoreDataManager.swift */,
 				7CEF5FEE2AB786D9004F199A /* NewsFeedCoreData.xcdatamodeld */,
-				7CEF5FFC2AB8B10C004F199A /* NewsCDEntity+CoreDataClass.swift */,
-				7CEF5FFD2AB8B10D004F199A /* NewsCDEntity+CoreDataProperties.swift */,
+				7C5B54392AC0A80E00CA03C7 /* NewsCDEntity+CoreDataProperties.swift */,
+				7C5B54382AC0A80E00CA03C7 /* NewsCDEntity+CoreDataClass.swift */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -289,7 +289,6 @@
 				7C6590F32AAF433700CF9EFA /* UserViewController.swift in Sources */,
 				7C6590C72AAE29BF00CF9EFA /* SceneDelegate.swift in Sources */,
 				7C6590DE2AAE332600CF9EFA /* HomeViewController.swift in Sources */,
-				7CEF5FFE2AB8B10D004F199A /* NewsCDEntity+CoreDataClass.swift in Sources */,
 				7CEF5FE82AB50216004F199A /* SourceViewController.swift in Sources */,
 				7CEF5FF72AB78BDD004F199A /* CoreDataManager.swift in Sources */,
 				7C5B54352ABF674000CA03C7 /* SaveButton.swift in Sources */,
@@ -297,14 +296,15 @@
 				7C6590EB2AAF378C00CF9EFA /* MainTabBarController.swift in Sources */,
 				7C6590F92AAF607700CF9EFA /* Constants.swift in Sources */,
 				7C6590E02AAE350300CF9EFA /* Extensions.swift in Sources */,
+				7C5B543A2AC0A80E00CA03C7 /* NewsCDEntity+CoreDataClass.swift in Sources */,
 				7CEF5FF02AB786D9004F199A /* NewsFeedCoreData.xcdatamodeld in Sources */,
 				7C6590EF2AAF431600CF9EFA /* DiscoverViewController.swift in Sources */,
 				7C6590E82AAE6D5A00CF9EFA /* Instruments.swift in Sources */,
 				7C6590FF2AAF9C6C00CF9EFA /* CategoryModel.swift in Sources */,
-				7CEF5FFF2AB8B10D004F199A /* NewsCDEntity+CoreDataProperties.swift in Sources */,
 				7CEF5FE62AB4CFD7004F199A /* DetailViewController.swift in Sources */,
 				7C6590E62AAE509300CF9EFA /* NewsCell.swift in Sources */,
 				7C6590F52AAF514400CF9EFA /* CategoryCell.swift in Sources */,
+				7C5B543B2AC0A80E00CA03C7 /* NewsCDEntity+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

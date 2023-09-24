@@ -13,13 +13,6 @@ final class DetailViewController: UIViewController {
     var currentArticle: Article!
     
     //MARK: - UI elements
-    lazy private var pullBar: UILabel = {
-        let pullBar = UILabel()
-        pullBar.clipsToBounds = true
-        pullBar.layer.cornerRadius = 2.5
-        pullBar.backgroundColor = .lightGray
-        return pullBar
-    }()
     lazy private var authorLabel: UILabel = {
         let authorLabel = UILabel()
         authorLabel.backgroundColor = .sand
@@ -66,6 +59,7 @@ final class DetailViewController: UIViewController {
         sourcePageButton.layer.borderColor = UIColor.primary.cgColor
         sourcePageButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         sourcePageButton.layer.borderWidth = 2
+        sourcePageButton.addTarget(self, action: #selector(goToSource), for: .touchUpInside)
         return sourcePageButton
     }()
     lazy private var saveButton: SaveButton = {
@@ -78,7 +72,6 @@ final class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.addSubview(pullBar)
         
         view.backgroundColor = .sand
         view.addSubview(authorLabel)
@@ -90,35 +83,40 @@ final class DetailViewController: UIViewController {
         view.addSubview(saveButton)
         makeConstraints()
         
+        
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let atricleTitle = currentArticle.title {
+            saveButton.checkIsSaved(atricleTitle)
+        }
+        setUpNavBar()
+
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        navigationController?.isNavigationBarHidden = true
     }
     
     //MARK: - Methods
     private func makeConstraints(){
         
-        pullBar.snp.makeConstraints { make in
-            make.centerX.equalTo(view)
-            make.width.equalTo(100)
-            make.height.equalTo(5)
-            make.top.equalTo(view).offset(15)
-        }
-        saveButton.snp.makeConstraints { make in
-            make.centerY.equalTo(authorLabel)
-            make.height.width.equalTo(44)
-            make.right.equalTo(view).offset(-15)
-        }
+        let margins = view.safeAreaLayoutGuide
         
-        authorLabel.snp.makeConstraints { make in
-            make.top.equalTo(pullBar.snp_bottomMargin).offset(35)
-            make.left.equalTo(view).inset(15)
-            make.right.lessThanOrEqualTo(saveButton.snp_leftMargin)
+        saveButton.snp.makeConstraints { make in
+            make.height.width.equalTo(44)
         }
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(authorLabel.snp_bottomMargin).offset(30)
-            make.left.right.equalTo(authorLabel)
+            make.top.equalTo(margins).offset(15)
+            make.left.right.equalTo(view).inset(15)
         }
         dateLabel.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp_bottomMargin).offset(20)
-            make.left.right.equalTo(titleLabel)
+            make.left.equalTo(titleLabel)
+        }
+        authorLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(dateLabel)
+            make.right.equalTo(titleLabel)
+            make.left.greaterThanOrEqualTo(dateLabel.snp.right).offset(15)
         }
         imageView.snp.makeConstraints { make in
             make.top.equalTo(dateLabel.snp.bottom).offset(20)
@@ -131,32 +129,47 @@ final class DetailViewController: UIViewController {
             make.bottom.lessThanOrEqualTo(sourcePageButton.snp_topMargin)
         }
         sourcePageButton.snp.makeConstraints { make in
-            make.bottom.equalTo(view).offset(-50)
+            make.bottom.lessThanOrEqualTo(view).offset(-150)
+            make.top.equalTo(descriptionLabel.snp.bottom).offset(15)
             make.right.left.equalTo(view).inset(100)
             make.height.equalTo(sourcePageButton.snp.width).dividedBy(4)
         }
     }
+    private func setUpNavBar(){
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.tintColor = .primary
+        navigationController?.navigationBar.backItem?.backButtonTitle = ""
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: saveButton)
+        
+    }
     @objc private func saveNews(_ sender: SaveButton){
         if sender.isSaved {
             guard let articleTitle = currentArticle.title else {return}
+            
                 CoreDataManager.shared.deleteNewsByTitle(articleTitle)
                 NotificationCenter.default.post(name: Notification.Name("DetailDidRemoveArticle"), object: nil)
-                dismiss(animated: true)
+            saveButton.toggleMode()
                 
         } else {
-            CoreDataManager.shared.createNews(title: currentArticle.title, descriptionText: currentArticle.description, timestamp: currentArticle.publishedAt, sourceURL: currentArticle.url, author: currentArticle.author, imageData: currentArticle.imageData)
-            if let articleTitle = currentArticle.title {
-                saveButton.checkIsSaved(articleTitle)
+            
+            fetchHTMLContent(forURL: currentArticle.url) { [unowned self] htmlData in
+                
+                CoreDataManager.shared.createNews(title: self.currentArticle.title, descriptionText: self.currentArticle.description, timestamp: self.currentArticle.publishedAt, sourceURL: self.currentArticle.url, author: self.currentArticle.author, imageData: self.currentArticle.imageData, htmlData: htmlData)
             }
+            
+            saveButton.toggleMode()
         }
       
+    }
+    @objc private func goToSource() {
+        if let url = currentArticle.url {
+            present(SourceViewController(url: url), animated: true)
+        }
     }
     
     //MARK: - Interface
     public func setContent(author: String, title: String, timeStamp: String?, url: String?, imageUrl: String? = nil, description: String, imageData: Data? = nil){
-        
-        saveButton.checkIsSaved(title)
-        
+                
         let attributedText = NSMutableAttributedString(string: "posted by \(author)")
         attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.lightGray, NSAttributedString.Key.font : UIFont.systemFont(ofSize: 20)], range: NSRange(location: 0, length: 10))
         attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.black, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 20)], range: NSRange(location: 10, length: author.count))

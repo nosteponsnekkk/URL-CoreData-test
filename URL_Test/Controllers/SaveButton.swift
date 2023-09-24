@@ -10,7 +10,6 @@ import UIKit
 class SaveButton: UIButton {
     
     //MARK: - Enum for modes
-
     private enum ButtonMode {
         case saved
         case notSaved
@@ -34,24 +33,27 @@ class SaveButton: UIButton {
         addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         
     }
+    private func setSavedMode(){
+        DispatchQueue.main.async { [unowned self] in
+            self.setImage(UIImage(named: "saved")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
+            self.tintColor = .primary
+            self.isSaved = true
+        }
+    }
+    private func setNotSavedMode(){
+        DispatchQueue.main.async { [unowned self] in
+            self.setImage(UIImage(named: "saved.light")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
+            self.tintColor = .black
+            self.isSaved = false
+        }
+    }
     private func setMode(mode: ButtonMode){
-        
+    
         switch mode {
         case .saved:
-            DispatchQueue.main.async { [unowned self] in
-                self.setImage(UIImage(named: "saved")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
-                self.tintColor = .primary
-                self.isSaved = true
-            }
-            
-            
+            setSavedMode()
         case .notSaved:
-            DispatchQueue.main.async { [unowned self] in
-                self.setImage(UIImage(named: "saved.light")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
-                self.tintColor = .black
-                self.isSaved = false
-            }
-            
+           setNotSavedMode()
         }
         
     }
@@ -67,6 +69,14 @@ class SaveButton: UIButton {
         }
     }
     public var isSaved = false
+    public func toggleMode(){
+        switch isSaved {
+        case true:
+            setNotSavedMode()
+        case false:
+            setSavedMode()
+        }
+    }
     @objc private func buttonTapped() {
             UIView.animate(withDuration: 0.1, animations: { [unowned self] in
                 self.transform = self.originalTransform.scaledBy(x: 0.9, y: 0.9)

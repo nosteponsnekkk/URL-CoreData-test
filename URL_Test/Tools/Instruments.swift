@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 //MARK: - Image Cacher Class
-
 public final class ImageCacher {
     
     public static let cacher = ImageCacher()
@@ -89,7 +88,6 @@ public final class ImageCacher {
 }
 
 //MARK: - Utility instruments
-    
 public func composedURL(request: String? = nil, pageNumber: Int? = nil, resultsForPage: Int? = nil, sources: [String]? = nil, country: String? = nil) -> String {
     var url:String
     defer {print("URL Created: \(url)")}
@@ -160,46 +158,77 @@ public func composedURL(request: String? = nil, pageNumber: Int? = nil, resultsF
 }
 
 //MARK: - Parsers
- internal func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> Void){
-    DispatchQueue.global(qos: .userInitiated).async {
-    let JSONDecoder = JSONDecoder()
-    let URLSession = URLSession(configuration: .default)
-        
-    guard let url = URL(string: string) else {print("⚠️ URL Composing Error: Unable to compose URL");return}
-    let urlRequest = URLRequest(url: url)
+internal func parseNewsArticles(url string: String, completion: @escaping ([Article]) -> Void){
+DispatchQueue.global(qos: .userInitiated).async {
+let JSONDecoder = JSONDecoder()
+let URLSession = URLSession(configuration: .default)
+    
+guard let url = URL(string: string) else {print("⚠️ URL Composing Error: Unable to compose URL");return}
+let urlRequest = URLRequest(url: url)
+            
+    URLSession.dataTask(with: urlRequest) { (data, response, error) in
+        if let error = error {
+            print("⚠️ URL Request Error:\(error.localizedDescription)")
+            return
+        } else if let data = data {
+            do {
+                let jsonData = try JSONDecoder.decode(News.self, from: data)
                 
-        URLSession.dataTask(with: urlRequest) { (data, response, error) in
-            if let error = error {
-                print("⚠️ URL Request Error:\(error.localizedDescription)")
-                return
-            } else if let data = data {
-                do {
-                    let jsonData = try JSONDecoder.decode(News.self, from: data)
-                    
-                    print("✅ Status:\(jsonData.status)")
-                    print("✅ Total Results:\(jsonData.totalResults)")
-                    
-                    //Checks for [Removed] news
-                    let validNews = jsonData.articles.filter { article in
-                            if article.source?.name != "[Removed]" &&
-                               article.title != "[Removed]" &&
-                               article.description != "[Removed]" {
-                                return true
-                            }
-                            return false
+                print("✅ Status:\(jsonData.status)")
+                print("✅ Total Results:\(jsonData.totalResults)")
+                
+                //Checks for [Removed] news
+                let validNews = jsonData.articles.filter { article in
+                        if article.source?.name != "[Removed]" &&
+                            article.title != "[Removed]" &&
+                            article.description != "[Removed]" {
+                            return true
                         }
-                    
-                    DispatchQueue.main.async {
-                        completion(validNews)
+                        return false
                     }
-                } catch  {
-                    print("⚠️ Decoding Error:\(error.localizedDescription)")
+                
+                DispatchQueue.main.async {
+                    completion(validNews)
+                }
+            } catch  {
+                print("⚠️ Decoding Error:\(error.localizedDescription)")
+            }
+        }
+        
+    }.resume()
+    
+}
+}
+internal func fetchHTMLContent(forURL urlString: String?, completion: @escaping (String?) -> Void) {
+    DispatchQueue.global(qos: .userInitiated).async {
+        guard let urlString = urlString else {return}
+        if let url = URL(string: urlString) {
+            let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+                if let error = error {
+                    print("⚠️ URL Request Error:\(error.localizedDescription)")
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                } else if let data = data, let htmlContent = String(data: data, encoding: .utf8) {
+                    DispatchQueue.main.async {
+                        completion(htmlContent)
+                    }
+                } else {
+                    print("⚠️ URL Request Error: Unable to get HTML-Content")
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
                 }
             }
-            
-        }.resume()
-        
+            task.resume()
+        } else {
+            print("⚠️ URL Request Error: Incorrect URL adress")
+            DispatchQueue.main.async {
+                completion(nil)
+            }
+        }
     }
+    
 }
 
 

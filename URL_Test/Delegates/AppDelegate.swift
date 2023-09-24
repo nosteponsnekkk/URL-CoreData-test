@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -22,31 +21,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {}
-
-    //MARK: - CoreData
-    
-    lazy public var persistentContainer: NSPersistentContainer = {
-        let persistentContainer = NSPersistentContainer(name: CoreDataManager.Constants.dataBaseName)
-        persistentContainer.loadPersistentStores { description, error in
-            if let error = error {
-                print("⚠️ CoreData Error: \(error.localizedDescription)")
-            } else {
-                print("✅ CoreData DB URL:\(description.url!.absoluteString)")
-            }
-            
-        }
-        return persistentContainer
-    }()
-    
-    public func saveContext(){
-        let context = persistentContainer.viewContext
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch  {
-                fatalError("❌ CoreData Saving Context Error: \(error.localizedDescription)")
-            }
-        }
-    }
 }
 
