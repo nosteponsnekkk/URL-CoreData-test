@@ -18,8 +18,9 @@ public final class ImageCacher {
 
     public func urlToImage(url string: String, completion: @escaping (UIImage?) -> Void){
         
+        
         // Creating IDs and URLs
-        guard let absoluteString = NSURL(string: string)?.absoluteString else {return}
+        guard let absoluteString = NSURL(string: string)?.absoluteString else {completion(UIImage(named: "noImageFound"));return}
         
         //Checks if the connection is secure
         guard isHTTPS(urlString: absoluteString) else {completion(UIImage(named: "noImageFound"));return}
@@ -50,17 +51,17 @@ public final class ImageCacher {
             // Creating URL Task
         let task = URLSession.shared.dataTask(with: url) {  (data, response, error) in
             if error != nil {
-                completion(nil)
-                return
+                completion(UIImage(named: "noImageFound"));return
             }
             
-            guard let data = data, let image = UIImage(data: data) else { completion(nil); return}
+            guard let data = data, let image = UIImage(data: data) else {completion(UIImage(named: "noImageFound"));return}
             
                 //Caching image
             self.cachedImages.setObject(image, forKey: imageID, cost: data.count)
             
                 DispatchQueue.main.async {
                     completion(image)
+                    return
                 }
             
             }

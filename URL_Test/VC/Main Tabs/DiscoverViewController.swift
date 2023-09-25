@@ -76,11 +76,9 @@ final class DiscoverViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if let searchQuery = (self.tabBarController as? MainTabBarController)?.searchQuery {
-            newsCount = 15
             searchTextField.text = searchQuery
             searchNews(search: searchQuery)
         } else {
-            newsCount = 15
             parseNewsArticles(url: composedURL(pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles in
                 self.articles = articles
                 DispatchQueue.main.async {
@@ -177,16 +175,22 @@ extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollecti
             }
         
         if collectionView == self.categoriesCollectionView {
-            return CGSize(width: 200 , height: 50)
+            let category = shared.categoriesArray[indexPath.item]
+                let cell = CategoryCell()
+                cell.setType(type: category.type)
+                let labelWidth = cell.getTitleLabelWidth()
+                let cellWidth = labelWidth + 30
+                
+                return CGSize(width: cellWidth, height: 50)
         }
         return CGSize()
         }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == self.newsCollectionView {
-            let vc = DetailViewController()
             let article = articles[indexPath.item]
-            vc.setContent(author: article.source?.name ?? "Unknown", title: article.title ?? "Some title", timeStamp: article.publishedAt, url: article.url, imageUrl: article.urlToImage ?? "", description: article.description ?? "")
+            let vc = DetailViewController(article: article)
+
             navigationController?.pushViewController(vc, animated: true)
         } else {
             let category = shared.categoriesArray[indexPath.item]

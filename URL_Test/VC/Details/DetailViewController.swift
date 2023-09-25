@@ -10,13 +10,25 @@ import UIKit
 final class DetailViewController: UIViewController {
     
     //MARK: - Data var
-    var currentArticle: Article!
+    var currentArticle: Article
     
     //MARK: - UI elements
     lazy private var authorLabel: UILabel = {
         let authorLabel = UILabel()
         authorLabel.backgroundColor = .sand
         authorLabel.numberOfLines = 2
+        var author = currentArticle.author ?? "Unknown"
+        if author == "Unknown" {
+            if let publisher = currentArticle.source?.name {
+                author = publisher
+            }
+          
+        }
+        let attributedText = NSMutableAttributedString(string: "posted by \(author)")
+        attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.lightGray, NSAttributedString.Key.font : UIFont.systemFont(ofSize: 20)], range: NSRange(location: 0, length: 10))
+        attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.black, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 20)], range: NSRange(location: 10, length: author.count))
+        authorLabel.attributedText = attributedText
+        
         return authorLabel
     }()
     lazy private var titleLabel: UILabel = {
@@ -25,6 +37,7 @@ final class DetailViewController: UIViewController {
         titleLabel.font = UIFont.boldSystemFont(ofSize: 24)
         titleLabel.textColor = UIColor.black
         titleLabel.numberOfLines = 0
+        titleLabel.text = currentArticle.title ?? ""
         return titleLabel
     }()
     lazy private var imageView: UIImageView = {
@@ -32,6 +45,7 @@ final class DetailViewController: UIViewController {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 15
         imageView.clipsToBounds = true
+        imageView.backgroundColor = .almostWhiteGray
         return imageView
     }()
     lazy private var dateLabel: UILabel = {
@@ -39,6 +53,7 @@ final class DetailViewController: UIViewController {
         dateLabel.backgroundColor = .sand
         dateLabel.font = UIFont.systemFont(ofSize: 18)
         dateLabel.textColor = .lightGray
+        dateLabel.text = currentArticle.publishedAt?.formattedNewsDate()
         return dateLabel
     }()
     lazy private var descriptionLabel: UILabel = {
@@ -47,6 +62,9 @@ final class DetailViewController: UIViewController {
         descriptionLabel.font = UIFont.systemFont(ofSize: 20)
         descriptionLabel.textColor = .black
         descriptionLabel.numberOfLines = 0
+        if let description = currentArticle.description {
+        descriptionLabel.text = !description.isEmpty ? description : "To see full description go to the source page"
+        }
         return descriptionLabel
     }()
     lazy private var sourcePageButton: UIButton = {
@@ -69,6 +87,14 @@ final class DetailViewController: UIViewController {
     }()
     
     //MARK: - ViewController lifecycle
+    required init?(coder: NSCoder) {
+        self.currentArticle = Article(author: "", title: "", description: "", urlToImage: "", publishedAt: "", url: "")
+        super.init(coder: coder)
+    }
+    init(article: Article){
+        self.currentArticle = article
+        super.init(nibName: nil, bundle: nil)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -83,6 +109,7 @@ final class DetailViewController: UIViewController {
         view.addSubview(saveButton)
         makeConstraints()
         
+        setImage()
         
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -142,6 +169,27 @@ final class DetailViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: saveButton)
         
     }
+    private func setImage(){
+        
+     
+        if let imageData = currentArticle.imageData {
+            DispatchQueue.main.async { [unowned self] in
+                self.imageView.image = UIImage(data: imageData)
+            }
+            
+            
+        } else if let imageURL = currentArticle.urlToImage {
+            ImageCacher.cacher.urlToImage(url: imageURL) { [unowned self] image in
+                DispatchQueue.main.async {
+                    self.imageView.image = image
+                }
+            }
+        } else {
+            imageView.image = UIImage(named: "noImageFound")
+        }
+        
+        
+    }
     @objc private func saveNews(_ sender: SaveButton){
         if sender.isSaved {
             guard let articleTitle = currentArticle.title else {return}
@@ -167,40 +215,5 @@ final class DetailViewController: UIViewController {
         }
     }
     
-    //MARK: - Interface
-    public func setContent(author: String, title: String, timeStamp: String?, url: String?, imageUrl: String? = nil, description: String, imageData: Data? = nil){
-                
-        let attributedText = NSMutableAttributedString(string: "posted by \(author)")
-        attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.lightGray, NSAttributedString.Key.font : UIFont.systemFont(ofSize: 20)], range: NSRange(location: 0, length: 10))
-        attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.black, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 20)], range: NSRange(location: 10, length: author.count))
-        authorLabel.attributedText = attributedText
-        
-        titleLabel.text = title
-        dateLabel.text = timeStamp?.formattedNewsDate()
-        
-        descriptionLabel.text = !description.isEmpty ? description : "To see full description go to the source page"
-        if let imageUrl = imageUrl {
-            ImageCacher.cacher.urlToImage(url: imageUrl) { [unowned self] image in
-                
-                self.currentArticle = Article(author: author, title: title, description: !description.isEmpty ? description : "To see full description go to the source page", publishedAt: timeStamp, url: url, imageData: image?.pngData())
-                
-                DispatchQueue.main.async{
-                    self.imageView.image = image
-                    saveButton.isEnabled = true
-                }
-                
-            }
-        } else if let imageData = imageData {
-            
-            self.currentArticle = Article(author: author, title: title, description: !description.isEmpty ? description : "To see full description go to the source page", publishedAt: timeStamp, url: url, imageData: imageData)
-            
-            DispatchQueue.main.async{ [unowned self] in
-                self.imageView.image = UIImage(data: imageData)
-                self.saveButton.setImage(UIImage(named: "saved")?.resize(to: CGSize(width: 33, height: 33)), for: .normal)
-                self.saveButton.tintColor = .primary
-                self.saveButton.isEnabled = true
-            }
-        }
-        
-    }
+  
 }

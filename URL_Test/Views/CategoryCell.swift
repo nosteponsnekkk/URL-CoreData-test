@@ -49,13 +49,15 @@ class CategoryCell: UICollectionViewCell {
         addSubview(titleLabel)
        
     }
-    private func makeConstraints(){
+    private func makeConstraints() {
         titleLabel.snp.makeConstraints { make in
-                make.left.right.equalTo(self).inset(15)
-                make.top.equalTo(self).inset(10)
-                make.bottom.lessThanOrEqualTo(self).inset(10) 
-            }
+            make.left.right.equalToSuperview().inset(15)
+            make.top.equalToSuperview().inset(10)
+            make.bottom.equalToSuperview().inset(10).priority(.high) 
+        }
     }
+
+    
     
     //MARK: - Interface
     public func setType(type: CategoryModel.Category){
@@ -67,4 +69,8 @@ class CategoryCell: UICollectionViewCell {
     
         }
     }
+    public func getTitleLabelWidth() -> CGFloat {
+    return self.titleLabel.intrinsicContentSize.width
+}
+
 }

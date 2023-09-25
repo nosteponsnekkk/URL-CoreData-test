@@ -360,7 +360,13 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             }
         
         if collectionView == self.categoriesCollectionView {
-            return CGSize(width: 200 , height: 50)
+            let category = shared.categoriesArray[indexPath.item]
+                let cell = CategoryCell()
+                cell.setType(type: category.type)
+                let labelWidth = cell.getTitleLabelWidth()
+                let cellWidth = labelWidth + 30
+                
+                return CGSize(width: cellWidth, height: 50)
         }
         return CGSize()
         }
@@ -368,8 +374,8 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if collectionView == self.breakingNewsCollectionView {
             let article = articles[indexPath.item]
-            let vc = DetailViewController()
-            vc.setContent(author: article.source?.name ?? "Unknown", title: article.title ?? "Some title", timeStamp: article.publishedAt, url: article.url, imageUrl: article.urlToImage ?? "", description: article.description ?? "")
+            let vc = DetailViewController(article: article)
+            
             navigationController?.pushViewController(vc, animated: true)
         } else {
             if let tabBarController = self.tabBarController as? MainTabBarController {

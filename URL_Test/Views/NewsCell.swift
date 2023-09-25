@@ -25,18 +25,11 @@ class NewsCell: UICollectionViewCell {
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.backgroundColor = .lightLightGray
         imageView.clipsToBounds = true
+        imageView.backgroundColor = .almostWhiteGray
         return imageView
 
         }()
-    private lazy var activityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView()
-        activityIndicator.color = .white
-        activityIndicator.startAnimating()
-        activityIndicator.style = .large
-        return activityIndicator
-    }()
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.textColor = .black
@@ -58,7 +51,7 @@ class NewsCell: UICollectionViewCell {
         return authorLabel
     }()
                     
-    //MARK: - INITS
+    //MARK: - Cell lifecycle
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -67,6 +60,10 @@ class NewsCell: UICollectionViewCell {
         super.init(frame: frame)
         setupCell()
         makeConstraints()
+    }
+    override func prepareForReuse() {
+        imageView.image = UIImage()
+        
     }
     
     //MARK: - Setting up methods
@@ -83,7 +80,6 @@ class NewsCell: UICollectionViewCell {
         layer.shadowPath = UIBezierPath(rect: self.bounds).cgPath
         
         addSubview(imageView)
-        imageView.addSubview(activityIndicator)
         
         addSubview(titleLabel)
         addSubview(dateLabel)
@@ -94,9 +90,7 @@ class NewsCell: UICollectionViewCell {
             make.top.left.right.equalTo(self).inset(15)
             make.height.equalTo(imageView.snp.width).dividedBy(1.8)
         }
-        activityIndicator.snp.makeConstraints { make in
-            make.edges.equalTo(imageView)
-        }
+        
         
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp_bottomMargin).offset(15)
@@ -128,7 +122,6 @@ class NewsCell: UICollectionViewCell {
         if let imageData = imageData {
             DispatchQueue.main.async { [unowned self] in
                 self.imageView.image = UIImage(data: imageData)
-                self.activityIndicator.removeFromSuperview()
             }
         }
         
@@ -136,13 +129,11 @@ class NewsCell: UICollectionViewCell {
                 ImageCacher.cacher.urlToImage(url: imageURL) { image in
                     DispatchQueue.main.async { [unowned self] in
                         self.imageView.image = image
-                        self.activityIndicator.removeFromSuperview()
                     }
                     
                 }
             } else {
                 imageView.image = UIImage(named: "noImageFound")
-                activityIndicator.removeFromSuperview()
             }
         
         
