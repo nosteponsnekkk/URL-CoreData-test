@@ -65,3 +65,22 @@ extension UIImage {
         return UIGraphicsGetImageFromCurrentImageContext()
     }
 }
+
+//MARK: - Greeting for time of day
+extension String {
+    static func greetingForTimeOfDay() -> String {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: Date())
+        
+        switch hour {
+        case 6..<12:
+            return "Good morning"
+        case 12..<17:
+            return "Good afternoon"
+        case 17..<22:
+            return "Good evening"
+        default:
+            return "Good night"
+        }
+    }
+}

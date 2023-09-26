@@ -17,13 +17,9 @@ final class DetailViewController: UIViewController {
         let authorLabel = UILabel()
         authorLabel.backgroundColor = .sand
         authorLabel.numberOfLines = 2
-        var author = currentArticle.author ?? "Unknown"
-        if author == "Unknown" {
-            if let publisher = currentArticle.source?.name {
-                author = publisher
-            }
-          
-        }
+        authorLabel.textAlignment = .right
+        let author = currentArticle.source?.name ?? currentArticle.author ?? "Unknown"
+        
         let attributedText = NSMutableAttributedString(string: "posted by \(author)")
         attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.lightGray, NSAttributedString.Key.font : UIFont.systemFont(ofSize: 20)], range: NSRange(location: 0, length: 10))
         attributedText.addAttributes([NSAttributedString.Key.foregroundColor : UIColor.black, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 20)], range: NSRange(location: 10, length: author.count))
@@ -51,7 +47,7 @@ final class DetailViewController: UIViewController {
     lazy private var dateLabel: UILabel = {
         let dateLabel = UILabel()
         dateLabel.backgroundColor = .sand
-        dateLabel.font = UIFont.systemFont(ofSize: 18)
+        dateLabel.font = UIFont.systemFont(ofSize: 20)
         dateLabel.textColor = .lightGray
         dateLabel.text = currentArticle.publishedAt?.formattedNewsDate()
         return dateLabel
@@ -108,9 +104,7 @@ final class DetailViewController: UIViewController {
         view.addSubview(sourcePageButton)
         view.addSubview(saveButton)
         makeConstraints()
-        
         setImage()
-        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -137,21 +131,22 @@ final class DetailViewController: UIViewController {
             make.left.right.equalTo(view).inset(15)
         }
         dateLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp_bottomMargin).offset(20)
+            make.top.equalTo(titleLabel.snp_bottomMargin).offset(25)
             make.left.equalTo(titleLabel)
         }
         authorLabel.snp.makeConstraints { make in
             make.centerY.equalTo(dateLabel)
             make.right.equalTo(titleLabel)
             make.left.greaterThanOrEqualTo(dateLabel.snp.right).offset(15)
+            make.width.equalTo(150)
         }
         imageView.snp.makeConstraints { make in
-            make.top.equalTo(dateLabel.snp.bottom).offset(20)
+            make.top.equalTo(dateLabel.snp.bottom).offset(25)
             make.left.right.equalTo(view).inset(15)
             make.height.equalTo(imageView.snp.width).dividedBy(1.5)
         }
         descriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp_bottomMargin).offset(15)
+            make.top.equalTo(imageView.snp_bottomMargin).offset(20)
             make.left.right.equalTo(view).inset(15)
             make.bottom.lessThanOrEqualTo(sourcePageButton.snp_topMargin)
         }
@@ -202,7 +197,12 @@ final class DetailViewController: UIViewController {
             
             fetchHTMLContent(forURL: currentArticle.url) { [unowned self] htmlData in
                 
-                CoreDataManager.shared.createNews(title: self.currentArticle.title, descriptionText: self.currentArticle.description, timestamp: self.currentArticle.publishedAt, sourceURL: self.currentArticle.url, author: self.currentArticle.author, imageData: self.currentArticle.imageData, htmlData: htmlData)
+                ImageCacher.cacher.urlToImage(url: self.currentArticle.urlToImage ?? "") { image in
+                    self.currentArticle.imageData = image?.pngData()
+                    CoreDataManager.shared.createNews(title: self.currentArticle.title, descriptionText: self.currentArticle.description, timestamp: self.currentArticle.publishedAt, sourceURL: self.currentArticle.url, author: self.currentArticle.source?.name, imageData: self.currentArticle.imageData, htmlData: htmlData)
+                }
+                
+                
             }
             
             saveButton.toggleMode()

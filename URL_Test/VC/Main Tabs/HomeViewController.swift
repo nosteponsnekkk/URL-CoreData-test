@@ -62,7 +62,7 @@ final class HomeViewController: UIViewController {
     }()
     lazy private var welcomeLabel: UILabel = {
         let welcomeLabel = UILabel()
-        welcomeLabel.text = "Welcome back! Oleg 👋"
+        welcomeLabel.text = "\(String.greetingForTimeOfDay())! Oleg 👋"
         welcomeLabel.numberOfLines = 1
         welcomeLabel.textColor = UIColor.lightGray
         welcomeLabel.font = UIFont.systemFont(ofSize: 18)
