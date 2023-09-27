@@ -15,7 +15,7 @@ class NewsCell: UICollectionViewCell {
     
     //MARK: - Enum
     
-    enum Style {
+    public enum Style {
         case large
         case small
     }

@@ -84,3 +84,24 @@ extension String {
         }
     }
 }
+
+//MARK: - Add animation for tapping button
+extension UIButton {
+    
+    func addTapAnimations() {
+        self.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+    }
+    @objc private func buttonTapped() {
+                UIView.animate(withDuration: 0.1, animations: { [unowned self] in
+                    self.transform = .identity.scaledBy(x: 0.97, y: 0.97)
+                }) { _ in
+                    UIView.animate(withDuration: 0.1) { [unowned self] in
+                        self.transform = .identity
+                    }
+                }
+                
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                               
+            }
+    
+}

@@ -14,9 +14,6 @@ class SaveButton: UIButton {
         case saved
         case notSaved
     }
-    
-    //MARK: - Original transform for animation
-    private var originalTransform: CGAffineTransform = .identity
 
     //MARK: - Inits
     init(){
@@ -30,8 +27,7 @@ class SaveButton: UIButton {
     //MARK: - Methods
     private func setupButton(){
         backgroundColor = .transparentWhite
-        addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        
+        addTapAnimations()
     }
     private func setSavedMode(){
         DispatchQueue.main.async { [unowned self] in
@@ -77,16 +73,6 @@ class SaveButton: UIButton {
             setSavedMode()
         }
     }
-    @objc private func buttonTapped() {
-            UIView.animate(withDuration: 0.1, animations: { [unowned self] in
-                self.transform = self.originalTransform.scaledBy(x: 0.9, y: 0.9)
-            }) { _ in
-                UIView.animate(withDuration: 0.1) { [unowned self] in
-                    self.transform = self.originalTransform
-                }
-            }
-            
-           
-        }
+  
     
 }

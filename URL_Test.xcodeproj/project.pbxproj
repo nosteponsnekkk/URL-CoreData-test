@@ -10,6 +10,11 @@
 		7C12AC602AC2AEAE00FADBC4 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 7C12AC5F2AC2AEAE00FADBC4 /* FirebaseAnalytics */; };
 		7C12AC622AC2AEAE00FADBC4 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 7C12AC612AC2AEAE00FADBC4 /* FirebaseAuth */; };
 		7C12AC642AC2AEAE00FADBC4 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 7C12AC632AC2AEAE00FADBC4 /* FirebaseFirestore */; };
+		7C1DA9222AC3371A00A30009 /* GreetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1DA9212AC3371900A30009 /* GreetingViewController.swift */; };
+		7C1DA9242AC33EAA00A30009 /* OnboardingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1DA9232AC33EAA00A30009 /* OnboardingButton.swift */; };
+		7C1DA9262AC3671A00A30009 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1DA9252AC3671A00A30009 /* OnboardingViewController.swift */; };
+		7C1DA9282AC36D0000A30009 /* OnboardingSeparator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1DA9272AC36CFF00A30009 /* OnboardingSeparator.swift */; };
+		7C1DA92A2AC377E300A30009 /* UserCreditsTextfield.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1DA9292AC377E300A30009 /* UserCreditsTextfield.swift */; };
 		7C5B54352ABF674000CA03C7 /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5B54342ABF674000CA03C7 /* SaveButton.swift */; };
 		7C5B543A2AC0A80E00CA03C7 /* NewsCDEntity+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5B54382AC0A80E00CA03C7 /* NewsCDEntity+CoreDataClass.swift */; };
 		7C5B543B2AC0A80E00CA03C7 /* NewsCDEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5B54392AC0A80E00CA03C7 /* NewsCDEntity+CoreDataProperties.swift */; };
@@ -38,6 +43,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7C1DA9212AC3371900A30009 /* GreetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingViewController.swift; sourceTree = "<group>"; };
+		7C1DA9232AC33EAA00A30009 /* OnboardingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingButton.swift; sourceTree = "<group>"; };
+		7C1DA9252AC3671A00A30009 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
+		7C1DA9272AC36CFF00A30009 /* OnboardingSeparator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingSeparator.swift; sourceTree = "<group>"; };
+		7C1DA9292AC377E300A30009 /* UserCreditsTextfield.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCreditsTextfield.swift; sourceTree = "<group>"; };
 		7C5B54342ABF674000CA03C7 /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		7C5B54382AC0A80E00CA03C7 /* NewsCDEntity+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewsCDEntity+CoreDataClass.swift"; sourceTree = "<group>"; };
 		7C5B54392AC0A80E00CA03C7 /* NewsCDEntity+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewsCDEntity+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -166,6 +176,7 @@
 			children = (
 				7C6590E52AAE509300CF9EFA /* NewsCell.swift */,
 				7C6590F42AAF514400CF9EFA /* CategoryCell.swift */,
+				7C1DA9272AC36CFF00A30009 /* OnboardingSeparator.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -175,6 +186,8 @@
 			children = (
 				7C6590EA2AAF378B00CF9EFA /* MainTabBarController.swift */,
 				7C5B54342ABF674000CA03C7 /* SaveButton.swift */,
+				7C1DA9232AC33EAA00A30009 /* OnboardingButton.swift */,
+				7C1DA9292AC377E300A30009 /* UserCreditsTextfield.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -191,6 +204,8 @@
 		7CEF5FEC2AB78033004F199A /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				7C1DA9212AC3371900A30009 /* GreetingViewController.swift */,
+				7C1DA9252AC3671A00A30009 /* OnboardingViewController.swift */,
 			);
 			path = Auth;
 			sourceTree = "<group>";
@@ -308,6 +323,8 @@
 				7CEF5FF72AB78BDD004F199A /* CoreDataManager.swift in Sources */,
 				7C5B54352ABF674000CA03C7 /* SaveButton.swift in Sources */,
 				7C6590F12AAF432700CF9EFA /* SavedViewController.swift in Sources */,
+				7C1DA9242AC33EAA00A30009 /* OnboardingButton.swift in Sources */,
+				7C1DA9222AC3371A00A30009 /* GreetingViewController.swift in Sources */,
 				7C6590EB2AAF378C00CF9EFA /* MainTabBarController.swift in Sources */,
 				7C6590F92AAF607700CF9EFA /* Constants.swift in Sources */,
 				7C6590E02AAE350300CF9EFA /* Extensions.swift in Sources */,
@@ -316,9 +333,12 @@
 				7C6590EF2AAF431600CF9EFA /* DiscoverViewController.swift in Sources */,
 				7C6590E82AAE6D5A00CF9EFA /* Instruments.swift in Sources */,
 				7C6590FF2AAF9C6C00CF9EFA /* CategoryModel.swift in Sources */,
+				7C1DA9262AC3671A00A30009 /* OnboardingViewController.swift in Sources */,
 				7CEF5FE62AB4CFD7004F199A /* DetailViewController.swift in Sources */,
 				7C6590E62AAE509300CF9EFA /* NewsCell.swift in Sources */,
 				7C6590F52AAF514400CF9EFA /* CategoryCell.swift in Sources */,
+				7C1DA92A2AC377E300A30009 /* UserCreditsTextfield.swift in Sources */,
+				7C1DA9282AC36D0000A30009 /* OnboardingSeparator.swift in Sources */,
 				7C5B543B2AC0A80E00CA03C7 /* NewsCDEntity+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
