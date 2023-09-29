@@ -62,7 +62,7 @@ final class HomeViewController: UIViewController {
     }()
     lazy private var welcomeLabel: UILabel = {
         let welcomeLabel = UILabel()
-        welcomeLabel.text = "\(String.greetingForTimeOfDay())! Oleg 👋"
+        welcomeLabel.text = "\(String.greetingForTimeOfDay())!👋"
         welcomeLabel.numberOfLines = 1
         welcomeLabel.textColor = UIColor.lightGray
         welcomeLabel.font = UIFont.systemFont(ofSize: 18)
@@ -81,12 +81,13 @@ final class HomeViewController: UIViewController {
         let string = "Find Breaking News"
         let attributedString = NSAttributedString(string: string, attributes:
         [NSAttributedString.Key.foregroundColor : UIColor.lightGray])
-        searchTextField.font = UIFont.systemFont(ofSize: 20)
+        searchTextField.font = UIFont.systemFont(ofSize: 22)
         searchTextField.attributedPlaceholder = attributedString
         searchTextField.backgroundColor = .transparentWhite
         searchTextField.clipsToBounds = true
         searchTextField.layer.cornerRadius = 15
         searchTextField.textColor = .white
+        searchTextField.leftView?.tintColor = .lightGray
         return searchTextField
     }()
     lazy private var breakingNewsLabel: UILabel = {
@@ -188,22 +189,30 @@ final class HomeViewController: UIViewController {
         searchTextField.delegate = self
         scrollView.delegate = self
         
-        DispatchQueue.main.async { [unowned self] in
+        
+            
             parseNewsArticles(url: composedURL(pageNumber: self.newsPage, resultsForPage: 10,
             sources: [shared.sources.ABCNews,shared.sources.BBC,shared.sources.Time,shared.sources.FoxNews,shared.sources.CNN,shared.sources.GoogleNews]))
             { articles in
                 self.articles = articles
+                DispatchQueue.main.async { [unowned self] in
                 UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
                     self.breakingNewsCollectionView.snp.updateConstraints { make in
                         make.height.equalTo(400)
                     }
                 } completion: { _ in
                     self.breakingNewsCollectionView.reloadData()
+                    }
                 }
 
             }
-        }
         
+        FirestoreManager.shared.getUserData { [unowned self] name in
+            DispatchQueue.main.async {
+                self.welcomeLabel.text = "\(String.greetingForTimeOfDay())! \(name)👋"
+
+            }
+        }
     }
 
     //MARK: - Other methods

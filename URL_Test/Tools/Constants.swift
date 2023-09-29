@@ -35,4 +35,5 @@ struct shared {
         static let Time = "time"
         static let ViceNews = "vice-news"
     }
+  
 }

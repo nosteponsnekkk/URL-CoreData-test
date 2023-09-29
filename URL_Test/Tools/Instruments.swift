@@ -232,5 +232,11 @@ internal func fetchHTMLContent(forURL urlString: String?, completion: @escaping 
     
 }
 
-
+//MARK: - Creates AC for error outputs
+public func showError(title: String, message: String) -> UIAlertController{
+    let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
+    ac.addAction(UIAlertAction(title: "Ok", style: .cancel))
+    ac.view.tintColor = .primary
+    return ac
+}
 

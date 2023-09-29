@@ -13,6 +13,7 @@ final class UserCreditsTextfield: UITextField {
     public enum CreditsType {
         case email
         case password
+        case name
     }
     
     //MARK: - ImageView
@@ -33,10 +34,12 @@ final class UserCreditsTextfield: UITextField {
     //MARK: - TextField setter
     private func setupField(_ credentials: CreditsType){
         
+        autocapitalizationType = .none
+        autocorrectionType = .no
+            
         leftViewMode = .always
         leftView = imageView
         leftView?.tintColor = .lightGray
-   
         
         layer.borderColor = UIColor.lightGray.cgColor
         layer.borderWidth = 2
@@ -56,11 +59,21 @@ final class UserCreditsTextfield: UITextField {
             attributedPlaceholder = text
             
         case .password:
+            isSecureTextEntry = true
             imageView.image = UIImage(named: "password")?.resize(to: CGSize(width: 33, height: 33))?.withRenderingMode(.alwaysTemplate)
             let text = NSMutableAttributedString(string: "Password")
             text.addAttributes(attributes, range: NSRange(location: 0, length: text.string.count))
             attributedPlaceholder = text
+            
+        case .name:
+        autocapitalizationType = .words
+            imageView.image = UIImage(named: "user")?.resize(to: CGSize(width: 33, height: 33))?.withRenderingMode(.alwaysTemplate)
+            let text = NSMutableAttributedString(string: "Your name")
+            text.addAttributes(attributes, range: NSRange(location: 0, length: text.string.count))
+            attributedPlaceholder = text
         }
+        
+        
     }
     
     //MARK: - Frames

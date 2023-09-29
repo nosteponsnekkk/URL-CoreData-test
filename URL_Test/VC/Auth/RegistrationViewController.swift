@@ -1,13 +1,13 @@
 //
-//  OnboardingViewController.swift
+//  RegistrationViewController.swift
 //  URL_Test
 //
-//  Created by Олег Наливайко on 26.09.2023.
+//  Created by Олег Наливайко on 27.09.2023.
 //
 
 import UIKit
 
-final class OnboardingViewController: UIViewController {
+class RegistrationViewController: UIViewController {
     
     //MARK: - UI Elements
     private lazy var signInTitleLabel: UILabel = {
@@ -15,7 +15,7 @@ final class OnboardingViewController: UIViewController {
         
         signInTitleLabel.numberOfLines = 2
         
-        let text = "Sign In\nEnter your email to sign in NewsFeed app"
+        let text = "Sign Up\nEnter your email to register to NewsFeed app"
         
         let attributedString = NSMutableAttributedString(string: text)
         attributedString.addAttributes([
@@ -37,6 +37,10 @@ final class OnboardingViewController: UIViewController {
         
         return signInTitleLabel
     }()
+    private lazy var nameField: UserCreditsTextfield = {
+        let nameField = UserCreditsTextfield(credentials: .name)
+        return nameField
+    }()
     private lazy var emailField: UserCreditsTextfield = {
         let emailField = UserCreditsTextfield(credentials: .email)
         return emailField
@@ -46,8 +50,8 @@ final class OnboardingViewController: UIViewController {
         return passwordField
     }()
     private lazy var signButton: OnboardingButton = {
-        let signButton = OnboardingButton(buttonTitle: "Sign in")
-        signButton.addTarget(self, action: #selector(loginEmail), for: .touchUpInside)
+        let signButton = OnboardingButton(buttonTitle: "Sign up")
+        signButton.addTarget(self, action: #selector(signUpEmail), for: .touchUpInside)
         return signButton
     }()
     private lazy var separator: OnboardingSeparator = {
@@ -58,56 +62,49 @@ final class OnboardingViewController: UIViewController {
         let signInGoogleButton = OnboardingButton(loginWith: .google)
         return signInGoogleButton
     }()
-    private lazy var questionRegisterLabel: UILabel = {
-        let questionRegisterLabel = UILabel()
-        questionRegisterLabel.text = "New to NewsFeed?"
-        questionRegisterLabel.font = UIFont.systemFont(ofSize: 18)
-        questionRegisterLabel.textColor = .lightGray
-        return questionRegisterLabel
-    }()
-    private lazy var goToRegisterButton: UIButton = {
-        let goToRegisterButton = UIButton(type: .system)
-        goToRegisterButton.setTitle("Register", for: .normal)
-        goToRegisterButton.titleLabel?.textColor = .blue
-        goToRegisterButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
-        goToRegisterButton.addTarget(self, action: #selector(goToRegistration), for: .touchUpInside)
-        return goToRegisterButton
-    }()
 
     //MARK: - ViewController Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         view.backgroundColor = .sand
+        setUpNavBar()
         
         view.addSubview(signInTitleLabel)
-        
+        view.addSubview(nameField)
         view.addSubview(emailField)
         view.addSubview(passwordField)
-        
         view.addSubview(signButton)
-        
         view.addSubview(separator)
-        
         view.addSubview(signInGoogleButton)
         
-        view.addSubview(questionRegisterLabel)
-        view.addSubview(goToRegisterButton)
-        
         makeConstraints()
+        
+     
+        
     }
     
     //MARK: - Methods
+    private func setUpNavBar(){
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.tintColor = .primary
+        
+    }
     private func makeConstraints(){
         signInTitleLabel.snp.makeConstraints { make in
             make.centerX.equalTo(view)
             make.top.equalTo(view).offset(75)
             make.left.right.equalTo(view).inset(25)
         }
-        emailField.snp.makeConstraints { make in
+        nameField.snp.makeConstraints { make in
             make.top.equalTo(signInTitleLabel.snp.bottom).offset(35)
             make.width.equalTo(signInTitleLabel)
             make.height.equalTo(emailField.snp.width).dividedBy(6)
+            make.centerX.equalTo(view)
+        }
+        emailField.snp.makeConstraints { make in
+            make.top.equalTo(nameField.snp_bottomMargin).offset(35)
+            make.size.equalTo(nameField)
             make.centerX.equalTo(view)
         }
         passwordField.snp.makeConstraints { make in
@@ -130,39 +127,30 @@ final class OnboardingViewController: UIViewController {
             make.size.equalTo(signButton)
             make.centerX.equalTo(view)
         }
-        questionRegisterLabel.snp.makeConstraints { make in
-            make.centerX.equalTo(view).offset(-50)
-            make.bottom.equalTo(view).offset(-75)
-        }
-        goToRegisterButton.snp.makeConstraints { make in
-            make.left.equalTo(questionRegisterLabel.snp_rightMargin).offset(15)
-            make.centerY.equalTo(questionRegisterLabel)
-        }
+        
         
     }
-    @objc private func goToRegistration(){
-        navigationController?.pushViewController(RegistrationViewController(), animated: true)
-    }
-    @objc private func loginEmail(){
+    @objc private func signUpEmail(){
         
-        let controllers = [emailField, passwordField, signButton, signInGoogleButton]
+        let controllers = [nameField, emailField, passwordField, signButton, signInGoogleButton]
         controllers.forEach({ $0.isEnabled = false })
         
-        guard let password = passwordField.text, let email = emailField.text else {return}
+        guard let name = nameField.text, let email = emailField.text, let password = passwordField.text else {return}
         
-        AuthenticationManager.shared.loginUser(email: email, password: password) { [unowned self] isLoggedIn, loginError in
-            
-            if let loginError = loginError {
-                self.present(loginError, animated: true)
-                controllers.forEach({ $0.isEnabled = true })
-                
-            } else if isLoggedIn {
-                
-                self.view.window?.rootViewController = MainTabBarController()
-                self.view.window?.makeKeyAndVisible()
-            }
-        }
-        
-    }
+            AuthenticationManager.shared.createUser(name: name, email: email, password: password) { [unowned self] isCreated, errorAlert in
 
+                    if isCreated {
+                        self.view.window?.rootViewController = MainTabBarController()
+                        self.view.window?.makeKeyAndVisible()
+                        
+                    } else if let errorAlert = errorAlert {
+                        self.present(errorAlert, animated: true)
+                        controllers.forEach({ $0.isEnabled = true })
+                    }
+                }
+                
+        
+        }
 }
+        
+        

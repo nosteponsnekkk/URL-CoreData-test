@@ -177,7 +177,7 @@ public final class CoreDataManager {
     }
     
     // MARK: - Constants
-    public struct Constants {
+    private struct Constants {
         static let dataBaseName = "NewsFeedCoreData"
         static let newsEntityName = "NewsCDEntity"
     }
