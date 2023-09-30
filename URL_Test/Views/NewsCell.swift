@@ -62,7 +62,8 @@ class NewsCell: UICollectionViewCell {
         makeConstraints()
     }
     override func prepareForReuse() {
-        imageView.image = UIImage()
+        imageView.image = nil
+        titleLabel.text = nil
         
     }
     

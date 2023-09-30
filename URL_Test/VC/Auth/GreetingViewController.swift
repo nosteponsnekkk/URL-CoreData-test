@@ -82,15 +82,8 @@ final class GreetingViewController: UIViewController {
         return .darkContent
     }
     @objc private func goToOnboarding() {
-        let onboardingViewController = UINavigationController(rootViewController: OnboardingViewController()) 
-        
-        let transitionOptions: UIView.AnimationOptions = [.transitionCrossDissolve, .showHideTransitionViews]
-        
-        UIView.transition(with: self.view.window!, duration: 0.3, options: transitionOptions, animations: {
-            let oldState: Bool = UIView.areAnimationsEnabled
-            UIView.setAnimationsEnabled(false)
-            self.view.window?.rootViewController = onboardingViewController
-            UIView.setAnimationsEnabled(oldState)
+        UIView.transition(with: self.view.window!, duration: 0.3, options: [.transitionCrossDissolve, .showHideTransitionViews], animations: {
+            self.view.window?.rootViewController = UINavigationController(rootViewController: OnboardingViewController())
         }, completion: nil)
     }
   

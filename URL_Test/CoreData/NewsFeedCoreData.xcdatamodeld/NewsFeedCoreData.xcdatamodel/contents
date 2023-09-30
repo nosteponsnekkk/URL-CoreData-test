@@ -9,14 +9,12 @@
         <attribute name="timestamp" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="UserCDEntity" representedClassName="UserCDEntity" syncable="YES" codeGenerationType="class">
-        <attribute name="categories" optional="YES" attributeType="Transformable"/>
+    <entity name="UserCDEntity" representedClassName="UserCDEntity" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="picture" optional="YES" attributeType="Binary"/>
-        <attribute name="sources" optional="YES" attributeType="Transformable"/>
     </entity>
     <elements>
         <element name="NewsCDEntity" positionX="-54" positionY="-9" width="128" height="134"/>
-        <element name="UserCDEntity" positionX="-54" positionY="45" width="128" height="89"/>
+        <element name="UserCDEntity" positionX="-54" positionY="45" width="128" height="59"/>
     </elements>
 </model>

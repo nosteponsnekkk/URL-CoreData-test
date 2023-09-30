@@ -17,19 +17,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        if AuthenticationManager.shared.auth.currentUser != nil {
+        if CoreDataManager.shared.doesUserExist() {
             window?.rootViewController = MainTabBarController()
-        } else {
-            window?.rootViewController = OnboardingViewController()
+            } else {
+                window?.rootViewController = GreetingViewController()
+            }
             
+        window?.makeKeyAndVisible()
+
+        
         }
         
-        window?.makeKeyAndVisible()
+        
+        
+
 
     }
 
    
 
 
-}
+
 

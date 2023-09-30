@@ -18,6 +18,7 @@ extension UIColor {
     static let lightLightGray = #colorLiteral(red: 0.8000000119, green: 0.8000000119, blue: 0.8000000119, alpha: 1)
     static let almostWhiteGray = #colorLiteral(red: 0.9410869479, green: 0.9412410855, blue: 0.9410542846, alpha: 1)
     static let sand = #colorLiteral(red: 0.937254902, green: 0.937254902, blue: 0.9215686275, alpha: 1)
+    static let lightGreen = #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)
 }
 
 //MARK: - Date-Tools extensions

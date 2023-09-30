@@ -207,10 +207,12 @@ final class HomeViewController: UIViewController {
 
             }
         
-        FirestoreManager.shared.getUserData { [unowned self] name in
-            DispatchQueue.main.async {
-                self.welcomeLabel.text = "\(String.greetingForTimeOfDay())! \(name)👋"
-
+        CoreDataManager.shared.fetchUserData { user in
+            if let user = user {
+                DispatchQueue.main.async {
+                    self.welcomeLabel.text = "\(String.greetingForTimeOfDay())! \(user.name ?? "Error getting user name")👋"
+                }
+                
             }
         }
     }

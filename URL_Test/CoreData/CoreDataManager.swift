@@ -54,6 +54,20 @@ public final class CoreDataManager {
             self.saveBackgroundContext()
         }
     }
+    public func createUserData(name: String?, profileImageData: Data? = nil) {
+        backgroundContext.perform {
+            guard let userEntityDescription = NSEntityDescription.entity(forEntityName: Constants.userEntityName, in: self.backgroundContext) else {
+                print("⚠️ CoreData Error: Couldn't create entity: userEntity")
+                return
+            }
+            let userEntity = UserCDEntity(entity: userEntityDescription, insertInto: self.backgroundContext)
+            
+            userEntity.name = name
+            userEntity.picture = profileImageData
+           
+            self.saveBackgroundContext()
+        }
+    }
 
     // Fetch asynchronously
     public func fetchAllNews(completion: @escaping ([NewsCDEntity]) -> Void) {
@@ -65,7 +79,7 @@ public final class CoreDataManager {
                     completion(news)
                 }
             } catch {
-                print("⚠️ CoreData Error: \(error.localizedDescription)")
+                print("⚠️ Fetching news CoreData Error: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     completion([])
                 }
@@ -85,12 +99,37 @@ public final class CoreDataManager {
                     completion(nil)
                 }
             } catch  {
-                print("⚠️ CoreData Error: \(error.localizedDescription)")
+                print("⚠️ Saving user CoreData Error: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     completion(nil)
                 }
             }
         }
+    }
+    public func fetchUserData(completion: @escaping (UserCDEntity?) -> Void) {
+        backgroundContext.perform {
+            let fetchRequest = NSFetchRequest<UserCDEntity>(entityName: Constants.userEntityName)
+            
+            do {
+                let result = try self.backgroundContext.fetch(fetchRequest)
+                if let user = result.first {
+                    completion(user)
+                } else {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                }
+            } catch  {
+                print("⚠️ Fetching user CoreData Error: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            }
+            
+            
+        }
+        
+        
     }
 
     // Update asynchronously
@@ -140,7 +179,20 @@ public final class CoreDataManager {
             }
         }
     }
-
+    public func deleteUser(){
+        backgroundContext.perform {
+            let fetchRequest = NSFetchRequest<UserCDEntity>(entityName: Constants.userEntityName)
+            do {
+                if let user = try self.backgroundContext.fetch(fetchRequest).first {
+                    self.backgroundContext.delete(user)
+                    self.saveBackgroundContext()
+                }
+                
+            } catch {
+                print("⚠️ CoreData Error: \(error.localizedDescription)")
+            }
+        }
+    }
     // Save changes on the background context and propagate to the main context
     private func saveBackgroundContext() {
         do {
@@ -149,11 +201,11 @@ public final class CoreDataManager {
                 do {
                     try mainContext.save()
                 } catch {
-                    print("⚠️ CoreData Error: \(error.localizedDescription)")
+                    print("⚠️ CoreData Save Main Context Error: \(error.localizedDescription)")
                 }
             }
         } catch {
-            print("⚠️ CoreData Error: \(error.localizedDescription)")
+            print("⚠️ CoreData Save Background Context Error: \(error.localizedDescription)")
         }
     }
 
@@ -175,11 +227,21 @@ public final class CoreDataManager {
             
         }
     }
+    public func doesUserExist() -> Bool{
+        let fetchRequest = NSFetchRequest<UserCDEntity>(entityName: Constants.userEntityName)
+        do {
+            return (try mainContext.fetch(fetchRequest).first != nil)
+        } catch {
+            print("⚠️ CoreData Does User Exist Error: \(error.localizedDescription)")
+            return false
+        }
+    }
     
     // MARK: - Constants
     private struct Constants {
         static let dataBaseName = "NewsFeedCoreData"
         static let newsEntityName = "NewsCDEntity"
+        static let userEntityName = "UserCDEntity"
     }
 }
 

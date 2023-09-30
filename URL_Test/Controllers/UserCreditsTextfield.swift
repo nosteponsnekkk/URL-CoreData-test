@@ -60,6 +60,7 @@ final class UserCreditsTextfield: UITextField {
             
         case .password:
             isSecureTextEntry = true
+            
             imageView.image = UIImage(named: "password")?.resize(to: CGSize(width: 33, height: 33))?.withRenderingMode(.alwaysTemplate)
             let text = NSMutableAttributedString(string: "Password")
             text.addAttributes(attributes, range: NSRange(location: 0, length: text.string.count))
