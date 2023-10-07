@@ -150,7 +150,24 @@ public final class CoreDataManager {
             }
         }
     }
-
+    public func updateUser(name: String? = nil, profileImageData: Data? = nil){
+        backgroundContext.perform {
+            let fetchRequest = NSFetchRequest<UserCDEntity>(entityName: Constants.userEntityName)
+            do {
+                if let updatedUser = try self.backgroundContext.fetch(fetchRequest).first {
+                    if let name = name {
+                        updatedUser.name = name
+                    }
+                    if let profileImageData = profileImageData {
+                        updatedUser.picture = profileImageData
+                    }
+                    self.saveBackgroundContext()
+                }
+            } catch  {
+                print("⚠️ CoreData Error: \(error.localizedDescription)")
+            }
+        }
+    }
     // Delete asynchronously
     public func deleteAllNews() {
         backgroundContext.perform {

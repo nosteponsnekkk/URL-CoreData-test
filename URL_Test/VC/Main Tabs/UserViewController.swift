@@ -9,8 +9,10 @@ import UIKit
 
 final class UserViewController: UIViewController {
     
-    var sectionsArray = [Section]()
+    //MARK: - Sections
+    private var sectionsArray = [Section]()
     
+    //MARK: - UI Elements
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.backgroundColor = .primary
@@ -27,10 +29,9 @@ final class UserViewController: UIViewController {
         return imageView
     }()
 
+    //MARK: - ViewController Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         
         view.backgroundColor = .primary
         
@@ -45,8 +46,10 @@ final class UserViewController: UIViewController {
         makeConstraints()
         setupArray()
         
+        getUserImage()
     }
     
+    //MARK: - Methods
     private func makeConstraints(){
         
         imageView.snp.makeConstraints { make in
@@ -65,14 +68,23 @@ final class UserViewController: UIViewController {
         sectionsArray.append(
             Section(title: "User General", options: [
                 SettingRowModel(title: "Change your name", icon: UIImage(named: "user"), bgcolor: .lightLightGray, handler: {}),
-                SettingRowModel(title: "Change profile icon", icon: UIImage(named: "image"), bgcolor: .blue, handler: {}),
-                SettingRowModel(title: "Change categories", icon: UIImage(named: "filter"), bgcolor: .grayPink, handler: {}),
-                SettingRowModel(title: "Change sources", icon: UIImage(named: "document"), bgcolor: .lightGreen, handler: {})
+                SettingRowModel(title: "Change profile icon", icon: UIImage(named: "image"), bgcolor: .blue, handler: { [unowned self] in
+                    self.pickImage()
+                }),
+                SettingRowModel(title: "Change categories and sources", icon: UIImage(named: "filter"), bgcolor: .grayPink, handler: { [unowned self] in
+                    self.navigationController?.pushViewController(CategorySourcesSelectorViewController(), animated: true)
+                }),
             ]))
         sectionsArray.append(
             Section(title: "Other", options: [
-            
-                SettingRowModel(title: "About the app", icon: UIImage(named: "info"), bgcolor: .blue, handler: {}),
+                SettingRowModel(title: "About the app", icon: UIImage(named: "info"), bgcolor: .lightGreen, handler: { [unowned self] in
+                    
+                    let ac = UIAlertController(title: "About the app", message: "This app is a pet-project. Made by Oleg Nalyvaiko (nosteponsnekkk). It shows the skills of working with: REST API, CoreData, Firebase, Parsing JSON, SnapKit code Autolayout.", preferredStyle: .alert)
+                    ac.addAction(UIAlertAction(title: "Great!", style: .cancel))
+                    ac.view.tintColor = .primary
+                    self.present(ac, animated: true)
+                    
+                }),
                 SettingRowModel(title: "Log out", icon: UIImage(named: "logout"), bgcolor: .grayPink, handler: {
                     let ac = UIAlertController(title: "Do you want to log out?", message: "Press continue to log out from NewsFeed", preferredStyle: .alert)
                     ac.addAction(UIAlertAction(title: "Continue", style: .default, handler: { [unowned self] _ in
@@ -93,12 +105,29 @@ final class UserViewController: UIViewController {
                
             ]))
     }
+    private func pickImage(){
+        let picker = UIImagePickerController()
+        picker.delegate = self
+        picker.allowsEditing = true
+        present(picker, animated: true)
+    }
+    private func getUserImage(){
+        CoreDataManager.shared.fetchUserData { userData in
+            if let userImage = UIImage(data: userData?.picture ?? Data()) {
+                DispatchQueue.main.async { [unowned self] in
+                    self.imageView.image = userImage
+                }
+            }
+        }
+    }
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
     
 }
 
+//MARK: - CollectionView Delegate
 extension UserViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -109,7 +138,7 @@ extension UserViewController: UITableViewDelegate, UITableViewDataSource {
     }
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let title = sectionsArray[section].title
-        return TableViewHeaderView(title: title)
+        return TableSectionView(title: title)
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 50
@@ -126,4 +155,19 @@ extension UserViewController: UITableViewDelegate, UITableViewDataSource {
         let setting = sectionsArray[indexPath.section].options[indexPath.row]
         setting.handler()
     }
+}
+
+//MARK: - UIImagePickerController Delegate
+extension UserViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = info[.editedImage] as? UIImage else { return }
+        if let imageData = image.pngData() {
+            CoreDataManager.shared.updateUser(profileImageData: imageData )
+        }
+        dismiss(animated: true) { [unowned self] in
+            self.getUserImage()
+        }
+    }
+    
 }

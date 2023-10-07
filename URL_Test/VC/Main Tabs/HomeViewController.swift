@@ -182,7 +182,7 @@ final class HomeViewController: UIViewController {
         breakingNewsCollectionView.delegate = self
         breakingNewsCollectionView.dataSource = self
         
-        categoriesCollectionView.register(CategoryCell.self, forCellWithReuseIdentifier: CategoryCell.cellID)
+        categoriesCollectionView.register(SourceCategoryCell.self, forCellWithReuseIdentifier: SourceCategoryCell.cellID)
         categoriesCollectionView.delegate = self
         categoriesCollectionView.dataSource = self
         
@@ -356,9 +356,9 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
             }
         }
         if collectionView == self.categoriesCollectionView {
-            let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCell.cellID, for: indexPath) as! CategoryCell
+            let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: SourceCategoryCell.cellID, for: indexPath) as! SourceCategoryCell
             let categoty = shared.categoriesArray[indexPath.item]
-            categoryCell.setType(type: categoty.type)
+            categoryCell.setCategoryType(type: categoty.type)
             return categoryCell
         }
         return UICollectionViewCell()
@@ -372,8 +372,8 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionVi
         
         if collectionView == self.categoriesCollectionView {
             let category = shared.categoriesArray[indexPath.item]
-                let cell = CategoryCell()
-                cell.setType(type: category.type)
+                let cell = SourceCategoryCell()
+                cell.setCategoryType(type: category.type)
                 let labelWidth = cell.getTitleLabelWidth()
                 let cellWidth = labelWidth + 30
                 

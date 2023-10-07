@@ -61,7 +61,7 @@ final class DiscoverViewController: UIViewController {
         
         makeConstraints()
         
-        categoriesCollectionView.register(CategoryCell.self, forCellWithReuseIdentifier: CategoryCell.cellID)
+        categoriesCollectionView.register(SourceCategoryCell.self, forCellWithReuseIdentifier: SourceCategoryCell.cellID)
         categoriesCollectionView.delegate = self
         categoriesCollectionView.dataSource = self
         
@@ -159,9 +159,9 @@ extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollecti
         }
             
         if collectionView == self.categoriesCollectionView {
-            let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: CategoryCell.cellID, for: indexPath) as! CategoryCell
+            let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: SourceCategoryCell.cellID, for: indexPath) as! SourceCategoryCell
             let category = shared.categoriesArray[indexPath.item]
-            categoryCell.setType(type: category.type)
+            categoryCell.setCategoryType(type: category.type)
             return categoryCell
         }
         return UICollectionViewCell()
@@ -176,8 +176,8 @@ extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollecti
         
         if collectionView == self.categoriesCollectionView {
             let category = shared.categoriesArray[indexPath.item]
-                let cell = CategoryCell()
-                cell.setType(type: category.type)
+                let cell = SourceCategoryCell()
+                cell.setCategoryType(type: category.type)
                 let labelWidth = cell.getTitleLabelWidth()
                 let cellWidth = labelWidth + 30
                 

@@ -19,6 +19,27 @@ struct shared {
         CategoryModel(title: "🏛️ Politics", URLFormattedTitle: "politics", type: .politics),
     ]
  
+    static let sourcesArray = [
+        SourceModel(title: "CNN", URLFormattedTitle: "cnn", type: .CNN),
+        SourceModel(title: "BBC", URLFormattedTitle: "bbc-news", type: .BBC),
+        SourceModel(title: "Google News", URLFormattedTitle: "google-news", type: .GoogleNews),
+        SourceModel(title: "Wired", URLFormattedTitle: "wired", type: .Wired),
+        SourceModel(title: "Fox News", URLFormattedTitle: "fox-news", type: .FoxNews),
+        SourceModel(title: "Business Insider", URLFormattedTitle: "business-insider", type: .BusinessInsider),
+        SourceModel(title: "ABC News", URLFormattedTitle: "abc-news", type: .ABCNews),
+        SourceModel(title: "Engadget", URLFormattedTitle: "engadget", type: .Engadget),
+        SourceModel(title: "The Verge", URLFormattedTitle: "the-verge", type: .TheVerge),
+        SourceModel(title: "Ars Technica", URLFormattedTitle: "ars-technica", type: .ArsTechnica),
+        SourceModel(title: "Bleacher Sport", URLFormattedTitle: "bleacher-report", type: .BleacherSport),
+        SourceModel(title: "TechRadar", URLFormattedTitle: "techradar", type: .TechRadar),
+        SourceModel(title: "Time", URLFormattedTitle: "time", type: .Time),
+        SourceModel(title: "ViceNews", URLFormattedTitle: "vice-news", type: .ViceNews),
+        
+
+        
+    ]
+    
+    
     struct sources {
         static let CNN = "cnn"
         static let BBC = "bbc-news"

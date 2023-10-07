@@ -7,10 +7,12 @@
 
 import UIKit
 
-class CategoryCell: UICollectionViewCell {
+class SourceCategoryCell: UICollectionViewCell {
     //MARK: - CELL ID
-    
     public static let cellID = UUID().uuidString
+    
+    //MARK: - Status
+    private var isActive = false
     
     //MARK: - Subviews
    
@@ -29,6 +31,7 @@ class CategoryCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupCell()
+        setView()
         makeConstraints()
     }
     
@@ -36,18 +39,27 @@ class CategoryCell: UICollectionViewCell {
     
     private func setupCell(){
         
-        backgroundColor = .grayPink
         layer.cornerRadius = 15
         clipsToBounds = true
                 
         layer.masksToBounds = false
         layer.shadowPath = UIBezierPath(rect: self.bounds).cgPath
         layer.shadowColor = UIColor.black.cgColor
-        layer.shadowRadius = 10
-        layer.shadowOpacity = 0.1
+        layer.shadowRadius = 5
+        layer.shadowOpacity = 0.01
         
         addSubview(titleLabel)
        
+    }
+    private func setView(){
+        switch isActive {
+        case true:
+            backgroundColor = .primary
+            titleLabel.textColor = .white
+        case false:
+            backgroundColor = .grayPink
+            titleLabel.textColor = .black
+        }
     }
     private func makeConstraints() {
         titleLabel.snp.makeConstraints { make in
@@ -60,9 +72,16 @@ class CategoryCell: UICollectionViewCell {
     
     
     //MARK: - Interface
-    public func setType(type: CategoryModel.Category){
-        
+    public func setCategoryType(type: CategoryModel.Category){
         for category in shared.categoriesArray {
+            if category.type == type {
+                titleLabel.text = category.title
+            }
+    
+        }
+    }
+    public func setSourceType(type: SourceModel.Source){
+        for category in shared.sourcesArray {
             if category.type == type {
                 titleLabel.text = category.title
             }
@@ -72,5 +91,9 @@ class CategoryCell: UICollectionViewCell {
     public func getTitleLabelWidth() -> CGFloat {
     return self.titleLabel.intrinsicContentSize.width
 }
+    public func toggleView(){
+        isActive.toggle()
+        setView()
+    }
 
 }
