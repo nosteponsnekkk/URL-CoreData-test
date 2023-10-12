@@ -13,9 +13,9 @@ class SourceCategoryCell: UICollectionViewCell {
     
     //MARK: - Status
     private var isActive = false
+    private var element: CategorySourceModel?
     
     //MARK: - Subviews
-   
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.font = UIFont.boldSystemFont(ofSize: 20)
@@ -23,11 +23,9 @@ class SourceCategoryCell: UICollectionViewCell {
     }()
                     
     //MARK: - INITS
-    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-   
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupCell()
@@ -35,6 +33,10 @@ class SourceCategoryCell: UICollectionViewCell {
         makeConstraints()
     }
     
+    //MARK: - Lifecycle
+    override func prepareForReuse() {
+            deselect()
+    }
     //MARK: - Setting up methods
     
     private func setupCell(){
@@ -70,29 +72,30 @@ class SourceCategoryCell: UICollectionViewCell {
     }
 
     
-    
     //MARK: - Interface
-    public func setCategoryType(type: CategoryModel.Category){
-        for category in shared.categoriesArray {
-            if category.type == type {
-                titleLabel.text = category.title
-            }
     
+    public func setAppearance(with element: CategorySourceModel) {
+            titleLabel.text = element.title
+        self.element = element
         }
+    public func isSelected() -> Bool{
+        return isActive
     }
-    public func setSourceType(type: SourceModel.Source){
-        for category in shared.sourcesArray {
-            if category.type == type {
-                titleLabel.text = category.title
-            }
     
-        }
-    }
+ 
     public func getTitleLabelWidth() -> CGFloat {
+    
     return self.titleLabel.intrinsicContentSize.width
 }
+    public func getElement() -> CategorySourceModel? {
+        return element
+    }
     public func toggleView(){
         isActive.toggle()
+        setView()
+    }
+    public func deselect() {
+        isActive = false
         setView()
     }
 

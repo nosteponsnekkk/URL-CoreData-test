@@ -16,13 +16,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
        
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-        
-        if CoreDataManager.shared.doesUserExist() {
-            window?.rootViewController = MainTabBarController()
+                
+        if CoreDataManager.shared.doesUserExist() && AuthenticationManager.shared.isUserOnline() {
+            window?.rootViewController = MainTabBarController.main
             } else {
                 window?.rootViewController = GreetingViewController()
             }
-            
         window?.makeKeyAndVisible()
 
         

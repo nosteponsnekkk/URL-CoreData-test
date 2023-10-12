@@ -12,6 +12,7 @@ final class HomeViewController: UIViewController {
         
     //MARK: - Data properties
     private var articles = [Article]()
+    private var categories = [CategorySourceModel]()
     private var newsPage = 1
     
     //MARK: - UI Elements
@@ -189,25 +190,21 @@ final class HomeViewController: UIViewController {
         searchTextField.delegate = self
         scrollView.delegate = self
         
-        
-            
-            parseNewsArticles(url: composedURL(pageNumber: self.newsPage, resultsForPage: 10,
-            sources: [shared.sources.ABCNews,shared.sources.BBC,shared.sources.Time,shared.sources.FoxNews,shared.sources.CNN,shared.sources.GoogleNews]))
-            { articles in
+        NewsAPIManager.shared.getHeadlineArticles { [unowned self] articles in
+            if let articles = articles {
                 self.articles = articles
-                DispatchQueue.main.async { [unowned self] in
-                UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
-                    self.breakingNewsCollectionView.snp.updateConstraints { make in
-                        make.height.equalTo(400)
-                    }
-                } completion: { _ in
+                DispatchQueue.main.async {
                     self.breakingNewsCollectionView.reloadData()
-                    }
                 }
-
             }
-        
-        CoreDataManager.shared.fetchUserData { user in
+        }
+        FirestoreManager.shared.getUserCategories { [unowned self] categories in
+            self.categories = categories
+            DispatchQueue.main.async {
+                self.categoriesCollectionView.reloadData()
+            }
+        }
+        CoreDataManager.shared.fetchUserData { [unowned self] user in
             if let user = user {
                 DispatchQueue.main.async {
                     self.welcomeLabel.text = "\(String.greetingForTimeOfDay())! \(user.name ?? "Error getting user name")👋"
@@ -268,7 +265,7 @@ final class HomeViewController: UIViewController {
         breakingNewsCollectionView.snp.makeConstraints { make in
             make.left.right.equalTo(contentView)
             make.top.equalTo(viewAllNewsButton.snp_bottomMargin)
-            make.height.equalTo(0)
+            make.height.equalTo(400)
         }
         
         categoriesTitleLabel.snp.makeConstraints { make in
@@ -294,11 +291,9 @@ final class HomeViewController: UIViewController {
         }
         
     }
-    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
-    
     @objc private func refreshNews(){
         articles.removeAll()
         newsPage += 1
@@ -307,121 +302,113 @@ final class HomeViewController: UIViewController {
         }
         breakingNewsCollectionView.reloadData()
         
-            parseNewsArticles(url: composedURL(pageNumber: self.newsPage, resultsForPage: 10)) { [unowned self] articles in
+        NewsAPIManager.shared.getHeadlineArticles(withPageNumber: newsPage) { [unowned self] articles in
+            if let articles = articles {
                 self.articles = articles
-                
                 DispatchQueue.main.async {
-                    UIView.animate(withDuration: 0.3, delay: 0, options: .curveLinear) {
-                        self.breakingNewsCollectionView.snp.updateConstraints { make in
-                            make.height.equalTo(400)
-                        }
-                    } completion: { _ in
-                            self.breakingNewsCollectionView.reloadData()
-                            self.scrollView.refreshControl?.endRefreshing()
-                        
-                    }
+                    self.breakingNewsCollectionView.reloadData()
+                    self.scrollView.refreshControl?.endRefreshing()
                 }
-               
-
             }
+            
+        }
         
     }
-    
 }
 // MARK: - CollectionView extension
 extension HomeViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == self.breakingNewsCollectionView {
+        
+        switch collectionView {
+        case breakingNewsCollectionView:
             return articles.count
+        case categoriesCollectionView:
+            return categories.count
+        default:
+            return 0
         }
-        if collectionView == self.categoriesCollectionView {
-            return shared.categoriesArray.count
-        }
-        return 0
+        
     }
-    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        if collectionView == self.breakingNewsCollectionView {
-            if !articles.isEmpty {
-                let article = articles[indexPath.item]
+        switch collectionView {
+        case breakingNewsCollectionView:
+            
+            let article = articles[indexPath.item]
                 
-                    let newsCell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsCell.cellID, for: indexPath) as! NewsCell
-                newsCell.setStyle(style: .large)
-                newsCell.setContent(imageURL: article.urlToImage , title: article.title , timeStamp: article.publishedAt , author: article.source?.name)
-                    return newsCell
-                } else {
-                    return UICollectionViewCell()
-            }
-        }
-        if collectionView == self.categoriesCollectionView {
+            let newsCell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsCell.cellID, for: indexPath) as! NewsCell
+            newsCell.setStyle(style: .large)
+            newsCell.setContent(imageURL: article.urlToImage , title: article.title , timeStamp: article.publishedAt , author: article.source?.name)
+            return newsCell
+                
+        case categoriesCollectionView:
             let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: SourceCategoryCell.cellID, for: indexPath) as! SourceCategoryCell
-            let categoty = shared.categoriesArray[indexPath.item]
-            categoryCell.setCategoryType(type: categoty.type)
+            let category = categories[indexPath.item]
+            categoryCell.setAppearance(with: category)
             return categoryCell
+            
+        default:
+            return UICollectionViewCell()
         }
-        return UICollectionViewCell()
+        
+       
     }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        if collectionView == self.breakingNewsCollectionView {
-            return CGSize(width: collectionView.bounds.height - 70 , height: collectionView.bounds.height - 50)
-            }
-        
-        if collectionView == self.categoriesCollectionView {
-            let category = shared.categoriesArray[indexPath.item]
+            switch collectionView {
+            case breakingNewsCollectionView:
+                return CGSize(width: collectionView.bounds.height - 70 , height: collectionView.bounds.height - 50)
+            case categoriesCollectionView:
+                let category = categories[indexPath.item]
                 let cell = SourceCategoryCell()
-                cell.setCategoryType(type: category.type)
+                cell.setAppearance(with: category)
+            
                 let labelWidth = cell.getTitleLabelWidth()
                 let cellWidth = labelWidth + 30
                 
                 return CGSize(width: cellWidth, height: 50)
+            default:
+                return CGSize()
+            }
+        
         }
-        return CGSize()
-        }
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == self.breakingNewsCollectionView {
+        
+        switch collectionView {
+        case breakingNewsCollectionView:
             let article = articles[indexPath.item]
             let vc = DetailViewController(article: article)
             
             navigationController?.pushViewController(vc, animated: true)
-        } else {
-            if let tabBarController = self.tabBarController as? MainTabBarController {
+        case categoriesCollectionView:
+            categoriesCollectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+            MainTabBarController.main.categoryQuery = categories[indexPath.item]
+            MainTabBarController.main.switchToTab(1)
+            NotificationCenter.default.post(name: Notification.Name("DidSetCategoryQuery"), object: nil)
             
-            tabBarController.searchQuery = shared.categoriesArray[indexPath.row].URLFormattedTitle
-            tabBarController.switchToTab(1)
-            }
+        default:
+            break
         }
-    }
     
-   
-
+    }
 }
-
 //MARK: - Search delegates
 extension HomeViewController: UISearchTextFieldDelegate, UIScrollViewDelegate {
-
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == searchTextField {
             textField.sendActions(for: .editingDidEnd)
             textField.resignFirstResponder()
-            if let text = textField.text?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) {
+            if let text = textField.text{
                 if !text.isEmpty{
-                    if let tabBarController = self.tabBarController as? MainTabBarController {
-                    tabBarController.searchQuery = text
-                    tabBarController.switchToTab(1)
-                    }
+                    MainTabBarController.main.searchQuery = text
+                    MainTabBarController.main.switchToTab(1)
+                    NotificationCenter.default.post(name: Notification.Name("DidSetSearchQuery"), object: nil)
                 }
             }
         }
         return true
     }
-
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
             searchTextField.resignFirstResponder()
     }
 }
-

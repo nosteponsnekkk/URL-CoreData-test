@@ -11,12 +11,17 @@ final class DiscoverViewController: UIViewController {
     
     //MARK: - Util variavbles
     private var didLoadMoreNews = false
-    private var newsCount = 15
+    private var newsCount = 0
+    
     private var lastContentOffsetY: CGFloat = 0
-    private var searchContex = ""
+    
+    private var sortingOption: NewsAPIManager.NewsAPISortingParameters = .byDate
+    
+    private var selectedCategory: CategorySourceModel!
     
     //MARK: - Data
     private var articles = [Article]()
+    private var categories = [CategorySourceModel]()
     
     //MARK: - Subviews
     private lazy var searchTextField: UISearchTextField = {
@@ -50,6 +55,17 @@ final class DiscoverViewController: UIViewController {
     }()
     
     //MARK: - ViewController Life Cycle
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    init(){
+        super.init(nibName: nil, bundle: nil)
+           //Checking for search request
+           NotificationCenter.default.addObserver(self, selector: #selector(gotSearchNotification), name: Notification.Name("DidSetSearchQuery"), object: nil)
+
+           //Checking for category request
+           NotificationCenter.default.addObserver(self, selector: #selector(gotCategoryNotification), name: Notification.Name("DidSetCategoryQuery"), object: nil)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -71,26 +87,25 @@ final class DiscoverViewController: UIViewController {
         
         searchTextField.delegate = self
      
-    }
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        //If no reuests from queries -> getting healines
+        if MainTabBarController.main.categoryQuery == nil && MainTabBarController.main.searchQuery == nil {
+            getHeadlines()
+        }
         
-        if let searchQuery = (self.tabBarController as? MainTabBarController)?.searchQuery {
-            searchTextField.text = searchQuery
-            searchNews(search: searchQuery)
-        } else {
-            parseNewsArticles(url: composedURL(pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles in
-                self.articles = articles
-                DispatchQueue.main.async {
-                self.newsCollectionView.reloadData()
-                }
-
+        //Getting categories
+        FirestoreManager.shared.getUserCategories { [unowned self] categories in
+            self.categories = categories
+            DispatchQueue.main.async {
+                self.categoriesCollectionView.reloadData()
             }
         }
-
+    }
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: Notification.Name("DidSetSearchQuery"), object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name("DidSetCategoryQuery"), object: nil)
     }
     
-    //MARK: - Other Methods
+    //MARK: - Methods
     private func makeConstraints(){
         
         let margins = view.safeAreaLayoutGuide
@@ -113,97 +128,183 @@ final class DiscoverViewController: UIViewController {
         }
         
     }
+    private func getHeadlines(){
+        NewsAPIManager.shared.getHeadlineArticles(withPageSize: 100, withPageNumber: 1, sorting: sortingOption) { [unowned self] articles in
+            if let articles = articles {
+                self.articles = articles
+                if articles.count >= 15 {
+                    newsCount = 15
+                } else {
+                    newsCount = articles.count
+                }
+                DispatchQueue.main.async {
+                    newsCollectionView.reloadData()
+                }
+            }
+        }
+    }
     private func searchNews(search: String){
-        newsCount = 15
-        searchContex = search
+        if articles.count >= 15 {
+            newsCount = 15
+        } else {
+            newsCount = articles.count
+        }
+        
+        selectedCategory = nil
+        for item in self.categoriesCollectionView.allItems() {
+            let category = item as! SourceCategoryCell
+            category.deselect()
+        }
+        
+        self.categoriesCollectionView.reloadData()
+
         articles.removeAll()
         newsCollectionView.reloadData()
-            parseNewsArticles(url: composedURL(request: searchContex, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] articles  in
+        let searchRequest = search.lowercased().replacingOccurrences(of: "", with: "-")
+        NewsAPIManager.shared.getArticlesWithKeyWord(searchRequest, withPageSize: 100, sorting: sortingOption) { [unowned self] articles in
+            if let articles = articles {
+                self.articles = articles
+                DispatchQueue.main.async {
+                    
+                    self.newsCollectionView.reloadData()
+                }
+                
+            }
+        }
+    }
+    private func getNewsByCategory(category: CategorySourceModel){
+        if articles.count >= 15 {
+            newsCount = 15
+        } else {
+            newsCount = articles.count
+        }
+        searchTextField.text?.removeAll()
+
+        articles.removeAll()
+        newsCollectionView.reloadData()
+        
+        NewsAPIManager.shared.getArticlesWithCategory(category, withPageSize: 100, sorting: sortingOption)
+        { [unowned self] articles in
+            if let articles = articles {
                 self.articles = articles
                 DispatchQueue.main.async {
                     self.newsCollectionView.reloadData()
                 }
-
             }
         }
-    
+        
+    }
+    @objc private func gotSearchNotification(){
+        if let searchQuery = MainTabBarController.main.searchQuery {
+            searchTextField.text = searchQuery
+            searchNews(search: searchQuery)
+            MainTabBarController.main.clearQuery()
+        }
+    }
+    @objc private func gotCategoryNotification(){
+        if let categoryQuery = MainTabBarController.main.categoryQuery{
+            getNewsByCategory(category: categoryQuery)
+            selectedCategory = categoryQuery
+            categoriesCollectionView.reloadData()
+            MainTabBarController.main.clearQuery()
+       }
+    }
 }
-
 //MARK: - CollectionView delegates
 extension DiscoverViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == self.newsCollectionView {
-            return articles.count
+        switch collectionView {
+        case newsCollectionView:
+            if articles.isEmpty {
+                return 0
+            }
+            return newsCount
+        case categoriesCollectionView:
+            return categories.count
+        default:
+            return 0
         }
-        if collectionView == self.categoriesCollectionView {
-            return shared.categoriesArray.count
-        }
-        return 0
+       
     }
-    
-    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        if collectionView == self.newsCollectionView {
-            if !articles.isEmpty {
+        switch collectionView {
+        case newsCollectionView:
                 let article = articles[indexPath.item]
-                
                     let newsCell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsCell.cellID, for: indexPath) as! NewsCell
                 newsCell.setStyle(style: .small)
                 newsCell.setContent(imageURL: article.urlToImage , title: article.title , timeStamp: article.publishedAt , author: article.source?.name)
                     return newsCell
-                } else {
-                    return UICollectionViewCell()
-                }
-        }
-            
-        if collectionView == self.categoriesCollectionView {
+             
+        case categoriesCollectionView:
             let categoryCell = collectionView.dequeueReusableCell(withReuseIdentifier: SourceCategoryCell.cellID, for: indexPath) as! SourceCategoryCell
-            let category = shared.categoriesArray[indexPath.item]
-            categoryCell.setCategoryType(type: category.type)
+            let category = categories[indexPath.item]
+            categoryCell.setAppearance(with: category)
+            
+            if selectedCategory == category {
+                categoryCell.toggleView()
+                
+            }
+            
             return categoryCell
-        }
-        return UICollectionViewCell()
+        default:
+            return UICollectionViewCell()
 
+        }
     }
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        if collectionView == self.newsCollectionView {
+        switch collectionView {
+        case newsCollectionView:
             return CGSize(width: (collectionView.bounds.width/2) - 10 , height: (collectionView.bounds.width/2) - 10)
-            }
-        
-        if collectionView == self.categoriesCollectionView {
-            let category = shared.categoriesArray[indexPath.item]
+        case categoriesCollectionView:
+            let category = categories[indexPath.item]
                 let cell = SourceCategoryCell()
-                cell.setCategoryType(type: category.type)
+                cell.setAppearance(with: category)
                 let labelWidth = cell.getTitleLabelWidth()
                 let cellWidth = labelWidth + 30
                 
                 return CGSize(width: cellWidth, height: 50)
+        default:
+            return CGSize()
+
         }
-        return CGSize()
+        
         }
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == self.newsCollectionView {
+        
+        switch collectionView {
+        case newsCollectionView:
             let article = articles[indexPath.item]
             let vc = DetailViewController(article: article)
-
             navigationController?.pushViewController(vc, animated: true)
-        } else {
-            let category = shared.categoriesArray[indexPath.item]
-            print(shared.categoriesArray)
-            searchContex = category.URLFormattedTitle
-            searchTextField.text = category.URLFormattedTitle
-            searchNews(search: category.URLFormattedTitle)
+        case categoriesCollectionView:
+            let cell = categoriesCollectionView.cellForItem(at: indexPath) as! SourceCategoryCell
+            let cells = categoriesCollectionView.allItems() as! [SourceCategoryCell]
+            
+            let category = categories[indexPath.item]
+            
+            if cell.isSelected() {
+                selectedCategory = nil
+                getHeadlines()
+                cell.deselect()
+            } else {
+                getNewsByCategory(category: category)
+                selectedCategory = category
+                categoriesCollectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+                for categoryCell in cells {
+                    categoryCell.deselect()
+                }
+                cell.toggleView()
+            }
+            
+        default:
+            break
         }
+       
 
     }
-
 }
-
 //MARK: - Search delegates
 extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegate {
 
@@ -214,7 +315,6 @@ extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegat
             
             if let text = textField.text?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) {
                 if !text.isEmpty{
-                searchContex = text
                 searchNews(search: text)
                 }
             }
@@ -235,18 +335,17 @@ extension DiscoverViewController: UISearchTextFieldDelegate, UIScrollViewDelegat
         if offsetY > contentHeight - screenHeight {
             if !didLoadMoreNews && offsetY > lastContentOffsetY {
                 didLoadMoreNews = true
-                lastContentOffsetY = offsetY 
+                lastContentOffsetY = offsetY
 
-                newsCount += 15
-
-              
-                parseNewsArticles(url: composedURL(request: !searchContex.isEmpty ? searchContex : nil, pageNumber: 1, resultsForPage: newsCount)) { [unowned self] updatedArticles in
-                    self.articles = updatedArticles
-                    DispatchQueue.main.async {
-                        self.newsCollectionView.reloadData()
-                        didLoadMoreNews = false
-                    }
+                if articles.count > 15 && articles.count - 15 > newsCount {
+                    newsCount += 15
+                } else {
+                    newsCount = articles.count
                 }
+            
+                didLoadMoreNews = false
+                newsCollectionView.reloadData()
+                
             }
         }
     }

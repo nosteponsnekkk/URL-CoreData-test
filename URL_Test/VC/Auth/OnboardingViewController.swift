@@ -89,7 +89,8 @@ final class OnboardingViewController: UIViewController {
         
         view.addSubview(separator)
         
-        view.addSubview(signInGoogleButton)
+        //TODO: Add Google sign in!
+//        view.addSubview(signInGoogleButton)
         
         view.addSubview(questionRegisterLabel)
         view.addSubview(goToRegisterButton)
@@ -125,11 +126,12 @@ final class OnboardingViewController: UIViewController {
             make.centerX.equalTo(view)
             make.top.equalTo(signButton.snp_bottomMargin).offset(10)
         }
-        signInGoogleButton.snp.makeConstraints { make in
-            make.top.equalTo(separator.snp_bottomMargin).offset(10)
-            make.size.equalTo(signButton)
-            make.centerX.equalTo(view)
-        }
+        //TODO: Add Google Sign in!
+//        signInGoogleButton.snp.makeConstraints { make in
+//            make.top.equalTo(separator.snp_bottomMargin).offset(10)
+//            make.size.equalTo(signButton)
+//            make.centerX.equalTo(view)
+//        }
         questionRegisterLabel.snp.makeConstraints { make in
             make.centerX.equalTo(view).offset(-50)
             make.bottom.equalTo(view).offset(-75)

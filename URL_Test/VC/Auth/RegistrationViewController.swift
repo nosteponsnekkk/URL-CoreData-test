@@ -140,7 +140,7 @@ class RegistrationViewController: UIViewController {
             AuthenticationManager.shared.createUser(name: name, email: email, password: password) { [unowned self] isCreated, errorAlert in
 
                     if isCreated {
-                        self.view.window?.rootViewController = MainTabBarController()
+                        self.view.window?.rootViewController = CategorySourcesSelectorViewController(mode: .create)
                         self.view.window?.makeKeyAndVisible()
                         
                     } else if let errorAlert = errorAlert {

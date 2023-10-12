@@ -106,3 +106,20 @@ extension UIButton {
             }
     
 }
+
+//MARK: - Get all the items from collectionView
+extension UICollectionView {
+    func allItems() -> [UICollectionViewCell] {
+        var allItems: [UICollectionViewCell] = []
+
+        for section in 0..<self.numberOfSections {
+            for item in 0..<self.numberOfItems(inSection: section) {
+                if let cell = self.cellForItem(at: IndexPath(item: item, section: section)) {
+                    allItems.append(cell)
+                }
+            }
+        }
+
+        return allItems
+    }
+}

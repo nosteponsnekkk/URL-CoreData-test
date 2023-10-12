@@ -46,6 +46,14 @@ final class SavedViewController: UIViewController {
     }()
     
     //MARK: - ViewController Life Cycle
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    init(){
+        super.init(nibName: nil, bundle: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadCollectionViewData), name: Notification.Name("DetailDidRemoveArticle"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadCollectionViewData), name: Notification.Name("DetailDidSaveArticle"), object: nil)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -59,20 +67,18 @@ final class SavedViewController: UIViewController {
         newsCollectionView.register(NewsCell.self, forCellWithReuseIdentifier: NewsCell.cellID)
         newsCollectionView.delegate = self
         newsCollectionView.dataSource = self
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadCollectionViewData), name: Notification.Name("DetailDidRemoveArticle"), object: nil)
 
-    }
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         fetchNews()
     }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         clearSavedNewsButton.isEnabled = false
     }
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name("DetailDidRemoveArticle"), object: nil)
+        NotificationCenter.default.removeObserver(self, name: Notification.Name("DetailDidSaveArticle"), object: nil)
+
     }
     
     //MARK: - Other Methods

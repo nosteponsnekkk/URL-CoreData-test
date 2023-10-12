@@ -106,5 +106,19 @@ class OnboardingButton: UIButton {
         }
         
     }
-   
+    
+    //MARK: - Interfaces
+    public func makeDisabled(){
+        isEnabled = false
+        UIView.animate(withDuration: 0.3) { [unowned self] in
+            self.layer.opacity = 0.3
+        }
+    }
+    public func makeEnabled(){
+        isEnabled = true
+        UIView.animate(withDuration: 0.3) { [unowned self] in
+            self.layer.opacity = 1
+        }
+    }
+
 }

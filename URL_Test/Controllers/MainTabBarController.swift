@@ -9,6 +9,7 @@ import UIKit
 
 class MainTabBarController: UITabBarController {
     
+    public static let main = MainTabBarController()
     
     // MARK: - Properties
     private let indicatorView: UIView = {
@@ -57,7 +58,7 @@ class MainTabBarController: UITabBarController {
                            generateVC(viewController: UserViewController(), image: UIImage(named: "profile"))
         ]
     }
-    private func generateVC(viewController: UIViewController, image: UIImage?) -> UIViewController{
+    private func generateVC(viewController: UIViewController, image: UIImage?) -> UIViewController {
         let resizedImage = image?.resize(to: CGSize(width: 30, height: 30))
             viewController.tabBarItem.image = resizedImage
         let navigationController = UINavigationController(rootViewController: viewController)
@@ -101,10 +102,21 @@ class MainTabBarController: UITabBarController {
     
     //MARK: - Interface
     public var searchQuery: String?
+    public var categoryQuery: CategorySourceModel?
     public func switchToTab(_ tabIndex: Int) {
             moveIndicator(at: tabIndex)
             selectedIndex = tabIndex
         }
+    public func clearQuery(){
+        searchQuery = nil
+        categoryQuery = nil
+    }
+    public func hideTabBar(){
+            self.tabBar.isHidden = true
+    }
+    public func showTabBar(){
+            self.tabBar.isHidden = false
+    }
     
 }
 

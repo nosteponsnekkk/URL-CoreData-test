@@ -67,12 +67,31 @@ final class UserViewController: UIViewController {
     private func setupArray() {
         sectionsArray.append(
             Section(title: "User General", options: [
-                SettingRowModel(title: "Change your name", icon: UIImage(named: "user"), bgcolor: .lightLightGray, handler: {}),
+                SettingRowModel(title: "Change your name", icon: UIImage(named: "user"), bgcolor: .lightLightGray, handler: { [unowned self] in
+                    let ac = UIAlertController(title: "Cange your name", message: "Enter new name for your profile", preferredStyle: .alert)
+                    ac.addTextField { textfield in
+                        textfield.placeholder = "Enter your new name"
+                    }
+                    ac.addAction(UIAlertAction(title: "Continue", style: .default, handler: { _ in
+                        guard let name: String = ac.textFields?[0].text else { return }
+                        AuthenticationManager.shared.updateUser(name: name) { isCompleted in
+                            if isCompleted {
+                                CoreDataManager.shared.updateUser(name: name)
+                            } else {
+                                self.present(showError(title: "The problem occured", message: "Couldn't change your name. Check your connection and try again"), animated: true)
+                            }
+                        }
+                        
+                    }))
+                    ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                    ac.view.tintColor = .primary
+                    self.present(ac, animated: true)
+                }),
                 SettingRowModel(title: "Change profile icon", icon: UIImage(named: "image"), bgcolor: .blue, handler: { [unowned self] in
                     self.pickImage()
                 }),
                 SettingRowModel(title: "Change categories and sources", icon: UIImage(named: "filter"), bgcolor: .grayPink, handler: { [unowned self] in
-                    self.navigationController?.pushViewController(CategorySourcesSelectorViewController(), animated: true)
+                    self.navigationController?.pushViewController(CategorySourcesSelectorViewController(mode: .update), animated: true)
                 }),
             ]))
         sectionsArray.append(

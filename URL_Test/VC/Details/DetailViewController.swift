@@ -174,9 +174,9 @@ final class DetailViewController: UIViewController {
             
             
         } else if let imageURL = currentArticle.urlToImage {
-            ImageCacher.cacher.urlToImage(url: imageURL) { [unowned self] image in
+            ImageCacher.cacher.urlToImage(url: imageURL) { [weak self] image in
                 DispatchQueue.main.async {
-                    self.imageView.image = image
+                    self?.imageView.image = image
                 }
             }
         } else {
@@ -195,11 +195,12 @@ final class DetailViewController: UIViewController {
                 
         } else {
             
-            fetchHTMLContent(forURL: currentArticle.url) { [unowned self] htmlData in
+            HTMLManager.shared.fetchHTMLContent(forURL: currentArticle.url) { [unowned self] htmlData in
                 
                 ImageCacher.cacher.urlToImage(url: self.currentArticle.urlToImage ?? "") { image in
                     self.currentArticle.imageData = image?.pngData()
                     CoreDataManager.shared.createNews(title: self.currentArticle.title, descriptionText: self.currentArticle.description, timestamp: self.currentArticle.publishedAt, sourceURL: self.currentArticle.url, author: self.currentArticle.source?.name, imageData: self.currentArticle.imageData, htmlData: htmlData)
+                    NotificationCenter.default.post(name: Notification.Name("DetailDidSaveArticle"), object: nil)
                 }
                 
                 
