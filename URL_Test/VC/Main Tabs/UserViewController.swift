@@ -77,6 +77,7 @@ final class UserViewController: UIViewController {
                         AuthenticationManager.shared.updateUser(name: name) { isCompleted in
                             if isCompleted {
                                 CoreDataManager.shared.updateUser(name: name)
+                                NotificationCenter.default.post(name: Notification.Name("UserDidChangeName"), object: nil)
                             } else {
                                 self.present(showError(title: "The problem occured", message: "Couldn't change your name. Check your connection and try again"), animated: true)
                             }

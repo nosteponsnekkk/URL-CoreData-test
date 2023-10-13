@@ -12,7 +12,23 @@ final class HomeViewController: UIViewController {
         
     //MARK: - Data properties
     private var articles = [Article]()
-    private var categories = [CategorySourceModel]()
+    private var categories = [CategorySourceModel]() {
+        didSet {
+            if categories.isEmpty {
+                categoriesTitleLabel.isHidden = true
+                categoriesCollectionView.isHidden = true
+                categoriesCollectionView.snp.updateConstraints { update in
+                    update.height.equalTo(7.5)
+                }
+            } else {
+                categoriesCollectionView.isHidden = false
+                categoriesTitleLabel.isHidden = false
+                categoriesCollectionView.snp.updateConstraints { update in
+                    update.height.equalTo(75)
+                }
+            }
+        }
+    }
     private var newsPage = 1
     
     //MARK: - UI Elements
@@ -103,6 +119,7 @@ final class HomeViewController: UIViewController {
         viewAllNewsButton.setTitle("View all", for: .normal)
         viewAllNewsButton.tintColor = .lightGray
         viewAllNewsButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        viewAllNewsButton.addTarget(self, action: #selector(goSeeMoreNews), for: .touchUpInside)
         return viewAllNewsButton
     }()
     lazy private var breakingNewsCollectionView: UICollectionView = {
@@ -122,13 +139,6 @@ final class HomeViewController: UIViewController {
         categoriesTitleLabel.textColor = .black
         return categoriesTitleLabel
     }()
-    lazy private var viewAllCategoriesButton: UIButton = {
-        let viewAllCategoriesButton = UIButton(type: .system)
-        viewAllCategoriesButton.setTitle("View all", for: .normal)
-        viewAllCategoriesButton.tintColor = .lightGray
-        viewAllCategoriesButton.titleLabel?.font = UIFont.systemFont(ofSize: 20)
-        return viewAllCategoriesButton
-    }()
     lazy private var categoriesCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let categoriesCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -147,6 +157,13 @@ final class HomeViewController: UIViewController {
     }()
 
     //MARK: - ViewController Lifecycle
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    init(){
+        super.init(nibName: nil, bundle: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(userDidCahngeName), name: Notification.Name("UserDidChangeName"), object: nil)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -173,7 +190,6 @@ final class HomeViewController: UIViewController {
         contentView.addSubview(breakingNewsCollectionView)
         
         contentView.addSubview(categoriesTitleLabel)
-        contentView.addSubview(viewAllCategoriesButton)
         
         contentView.addSubview(categoriesCollectionView)
                         
@@ -213,7 +229,9 @@ final class HomeViewController: UIViewController {
             }
         }
     }
-
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: Notification.Name("UserDidChangeName"), object: nil)
+    }
     //MARK: - Other methods
     private func makeConstraints(){
         
@@ -273,15 +291,10 @@ final class HomeViewController: UIViewController {
             make.left.equalTo(breakingNewsLabel)
         }
         
-        viewAllCategoriesButton.snp.makeConstraints { make in
-            make.top.equalTo(breakingNewsCollectionView.snp.bottom)
-            make.right.equalTo(viewAllNewsButton)
-        }
-        
         categoriesCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(viewAllCategoriesButton.snp_bottomMargin)
+            make.top.equalTo(categoriesTitleLabel.snp_bottomMargin).offset(15)
             make.left.right.equalTo(contentView)
-            make.height.equalTo(100)
+            make.height.equalTo(75)
         }
         
         bottomColor.snp.makeConstraints { make in
@@ -313,6 +326,18 @@ final class HomeViewController: UIViewController {
             
         }
         
+    }
+    @objc private func goSeeMoreNews(){
+        MainTabBarController.main.switchToTab(1)
+    }
+    @objc private func userDidCahngeName(){
+        CoreDataManager.shared.fetchUserData { userEntity in
+            if let userEntity = userEntity {
+                DispatchQueue.main.async {
+                    self.welcomeLabel.text = "\(String.greetingForTimeOfDay())! \(userEntity.name ?? "Error getting user name")👋"
+                }
+            }
+        }
     }
 }
 // MARK: - CollectionView extension

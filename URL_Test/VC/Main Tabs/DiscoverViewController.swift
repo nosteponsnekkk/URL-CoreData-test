@@ -20,8 +20,34 @@ final class DiscoverViewController: UIViewController {
     private var selectedCategory: CategorySourceModel!
     
     //MARK: - Data
-    private var articles = [Article]()
-    private var categories = [CategorySourceModel]()
+    private var articles = [Article]() {
+        didSet {
+            if !articles.isEmpty {
+                DispatchQueue.main.async { [unowned self] in
+                    self.newsCountLabel.text = "Showing \(self.articles.count) results"
+                }
+            } else {
+                DispatchQueue.main.async { [unowned self] in
+                    self.newsCountLabel.text = "No articles found for this request"
+                }
+            }
+        }
+    }
+    private var categories = [CategorySourceModel]() {
+        didSet {
+            if categories.isEmpty {
+                categoriesCollectionView.isHidden = true
+                categoriesCollectionView.snp.updateConstraints { update in
+                    update.height.equalTo(7.5)
+                }
+            } else {
+                categoriesCollectionView.isHidden = false
+                categoriesCollectionView.snp.updateConstraints { update in
+                    update.height.equalTo(75)
+                }
+            }
+        }
+    }
     
     //MARK: - Subviews
     private lazy var searchTextField: UISearchTextField = {
@@ -53,6 +79,13 @@ final class DiscoverViewController: UIViewController {
         newsCollectionView.contentInset = UIEdgeInsets(top: 5, left: 5, bottom: 15, right: 5)
         return newsCollectionView
     }()
+    private lazy var newsCountLabel: UILabel = {
+        let newsCountLabel = UILabel()
+        newsCountLabel.font = UIFont.systemFont(ofSize: 20)
+        newsCountLabel.textColor = .lightGray
+        newsCountLabel.isHidden = true
+        return newsCountLabel
+    }()
     
     //MARK: - ViewController Life Cycle
     required init?(coder: NSCoder) {
@@ -73,6 +106,7 @@ final class DiscoverViewController: UIViewController {
         
         view.addSubview(searchTextField)
         view.addSubview(categoriesCollectionView)
+        view.addSubview(newsCountLabel)
         view.addSubview(newsCollectionView)
         
         makeConstraints()
@@ -115,20 +149,23 @@ final class DiscoverViewController: UIViewController {
             make.left.right.equalTo(view).inset(15)
             make.height.equalTo(searchTextField.snp.width).dividedBy(8)
         }
-        
         categoriesCollectionView.snp.makeConstraints { make in
             make.top.equalTo(searchTextField.snp.bottom)
             make.left.right.equalTo(view)
-            make.height.equalTo(100)
+            make.height.equalTo(75)
         }
-        
+        newsCountLabel.snp.makeConstraints { make in
+            make.left.right.equalTo(margins).inset(15)
+            make.top.equalTo(categoriesCollectionView.snp_bottomMargin).offset(7.5)
+        }
         newsCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(categoriesCollectionView.snp.bottom)
+            make.top.equalTo(newsCountLabel.snp.bottom).offset(7.5)
             make.left.right.bottom.equalTo(view)
         }
         
     }
     private func getHeadlines(){
+        newsCountLabel.isHidden = true
         NewsAPIManager.shared.getHeadlineArticles(withPageSize: 100, withPageNumber: 1, sorting: sortingOption) { [unowned self] articles in
             if let articles = articles {
                 self.articles = articles
@@ -137,13 +174,15 @@ final class DiscoverViewController: UIViewController {
                 } else {
                     newsCount = articles.count
                 }
-                DispatchQueue.main.async {
-                    newsCollectionView.reloadData()
+                DispatchQueue.main.async { [unowned self] in
+                    self.newsCollectionView.reloadData()
+                    self.newsCountLabel.isHidden = false
                 }
             }
         }
     }
     private func searchNews(search: String){
+        newsCountLabel.isHidden = true
         if articles.count >= 15 {
             newsCount = 15
         } else {
@@ -164,15 +203,17 @@ final class DiscoverViewController: UIViewController {
         NewsAPIManager.shared.getArticlesWithKeyWord(searchRequest, withPageSize: 100, sorting: sortingOption) { [unowned self] articles in
             if let articles = articles {
                 self.articles = articles
-                DispatchQueue.main.async {
+                DispatchQueue.main.async { [unowned self] in
                     
                     self.newsCollectionView.reloadData()
+                    self.newsCountLabel.isHidden = false
                 }
                 
             }
         }
     }
     private func getNewsByCategory(category: CategorySourceModel){
+        newsCountLabel.isHidden = true
         if articles.count >= 15 {
             newsCount = 15
         } else {
@@ -187,8 +228,10 @@ final class DiscoverViewController: UIViewController {
         { [unowned self] articles in
             if let articles = articles {
                 self.articles = articles
-                DispatchQueue.main.async {
+                DispatchQueue.main.async { [unowned self] in
                     self.newsCollectionView.reloadData()
+                    self.newsCountLabel.isHidden = false
+
                 }
             }
         }

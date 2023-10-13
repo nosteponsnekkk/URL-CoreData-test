@@ -15,7 +15,16 @@ final class SavedViewController: UIViewController {
     private var lastContentOffsetY: CGFloat = 0
     
     //MARK: - Data
-    private var articles = [Article]()
+    private var articles = [Article]() {
+        didSet {
+            switch articles.isEmpty {
+            case true:
+                self.clearSavedNewsButton.isEnabled = false
+            case false:
+                self.clearSavedNewsButton.isEnabled = true
+            }
+        }
+    }
     
     //MARK: - Subviews
     private lazy var titleLabel: UILabel = {
@@ -70,11 +79,6 @@ final class SavedViewController: UIViewController {
 
         fetchNews()
     }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        clearSavedNewsButton.isEnabled = false
-    }
     deinit {
         NotificationCenter.default.removeObserver(self, name: Notification.Name("DetailDidRemoveArticle"), object: nil)
         NotificationCenter.default.removeObserver(self, name: Notification.Name("DetailDidSaveArticle"), object: nil)
@@ -126,6 +130,7 @@ final class SavedViewController: UIViewController {
         present(ac, animated: true)
     }
     @objc private func reloadCollectionViewData() {
+        self.clearSavedNewsButton.isEnabled = false
         fetchNews()
     }
 
