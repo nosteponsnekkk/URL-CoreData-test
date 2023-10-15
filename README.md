@@ -55,3 +55,6 @@ https://github.com/nosteponsnekkk/URL-CoreData-test/assets/132587059/939aa788-08
 
 https://github.com/nosteponsnekkk/URL-CoreData-test/assets/132587059/784e8e0f-ed3a-4202-9bf0-5529682a6395
 
+UI/UX Design by Rifqi Arkaanul
+https://www.figma.com/community/file/1220951169416394147
+
