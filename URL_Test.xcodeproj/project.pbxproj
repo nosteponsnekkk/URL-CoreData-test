@@ -24,6 +24,8 @@
 		7C1DA9442AC7810200A30009 /* NewsCDEntity+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1DA9402AC7810200A30009 /* NewsCDEntity+CoreDataProperties.swift */; };
 		7C1DA9462AC794C900A30009 /* SettingRowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1DA9452AC794C800A30009 /* SettingRowModel.swift */; };
 		7C1DA9482AC794F700A30009 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1DA9472AC794F700A30009 /* SettingCell.swift */; };
+		7C20428E2AD962B900167050 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 7C20428D2AD962B900167050 /* GoogleSignIn */; };
+		7C2042902AD962B900167050 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 7C20428F2AD962B900167050 /* GoogleSignInSwift */; };
 		7C21FBEF2AD43B0500D2DC94 /* HTMLManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C21FBEE2AD43B0400D2DC94 /* HTMLManager.swift */; };
 		7C25F19E2AD18025007D3420 /* NewsAPIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C25F19D2AD18024007D3420 /* NewsAPIManager.swift */; };
 		7C25F1A02AD1805C007D3420 /* ImageCacher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C25F19F2AD1805C007D3420 /* ImageCacher.swift */; };
@@ -103,8 +105,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C20428E2AD962B900167050 /* GoogleSignIn in Frameworks */,
 				7C12AC602AC2AEAE00FADBC4 /* FirebaseAnalytics in Frameworks */,
 				7C12AC642AC2AEAE00FADBC4 /* FirebaseFirestore in Frameworks */,
+				7C2042902AD962B900167050 /* GoogleSignInSwift in Frameworks */,
 				7C12AC622AC2AEAE00FADBC4 /* FirebaseAuth in Frameworks */,
 				7C6590E32AAE3F2800CF9EFA /* SnapKit in Frameworks */,
 			);
@@ -287,6 +291,8 @@
 				7C12AC5F2AC2AEAE00FADBC4 /* FirebaseAnalytics */,
 				7C12AC612AC2AEAE00FADBC4 /* FirebaseAuth */,
 				7C12AC632AC2AEAE00FADBC4 /* FirebaseFirestore */,
+				7C20428D2AD962B900167050 /* GoogleSignIn */,
+				7C20428F2AD962B900167050 /* GoogleSignInSwift */,
 			);
 			productName = URL_Test;
 			productReference = 7C6590C12AAE29BF00CF9EFA /* URL_Test.app */;
@@ -319,6 +325,7 @@
 			packageReferences = (
 				7C6590E12AAE3F2700CF9EFA /* XCRemoteSwiftPackageReference "SnapKit" */,
 				7C12AC5E2AC2AEAE00FADBC4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				7C20428C2AD962B800167050 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			productRefGroup = 7C6590C22AAE29BF00CF9EFA /* Products */;
 			projectDirPath = "";
@@ -535,6 +542,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = URL_Test/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NewsFeed;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Allow to use photo library";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -564,6 +572,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = URL_Test/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NewsFeed;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Allow to use photo library";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -614,6 +623,14 @@
 				version = 8.15.0;
 			};
 		};
+		7C20428C2AD962B800167050 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 		7C6590E12AAE3F2700CF9EFA /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -644,6 +661,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7C12AC5E2AC2AEAE00FADBC4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		7C20428D2AD962B900167050 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C20428C2AD962B800167050 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		7C20428F2AD962B900167050 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C20428C2AD962B800167050 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
 		};
 		7C6590E22AAE3F2800CF9EFA /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;

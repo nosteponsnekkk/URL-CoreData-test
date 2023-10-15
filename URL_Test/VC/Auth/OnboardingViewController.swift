@@ -56,6 +56,7 @@ final class OnboardingViewController: UIViewController {
     }()
     private lazy var signInGoogleButton: OnboardingButton = {
         let signInGoogleButton = OnboardingButton(loginWith: .google)
+        signInGoogleButton.addTarget(self, action: #selector(authWithGoogle), for: .touchUpInside)
         return signInGoogleButton
     }()
     private lazy var questionRegisterLabel: UILabel = {
@@ -88,9 +89,8 @@ final class OnboardingViewController: UIViewController {
         view.addSubview(signButton)
         
         view.addSubview(separator)
-        
-        //TODO: Add Google sign in!
-//        view.addSubview(signInGoogleButton)
+                
+        view.addSubview(signInGoogleButton)
         
         view.addSubview(questionRegisterLabel)
         view.addSubview(goToRegisterButton)
@@ -126,12 +126,11 @@ final class OnboardingViewController: UIViewController {
             make.centerX.equalTo(view)
             make.top.equalTo(signButton.snp_bottomMargin).offset(10)
         }
-        //TODO: Add Google Sign in!
-//        signInGoogleButton.snp.makeConstraints { make in
-//            make.top.equalTo(separator.snp_bottomMargin).offset(10)
-//            make.size.equalTo(signButton)
-//            make.centerX.equalTo(view)
-//        }
+        signInGoogleButton.snp.makeConstraints { make in
+            make.top.equalTo(separator.snp_bottomMargin).offset(10)
+            make.size.equalTo(signButton)
+            make.centerX.equalTo(view)
+        }
         questionRegisterLabel.snp.makeConstraints { make in
             make.centerX.equalTo(view).offset(-50)
             make.bottom.equalTo(view).offset(-75)
@@ -144,6 +143,25 @@ final class OnboardingViewController: UIViewController {
     }
     @objc private func goToRegistration(){
         navigationController?.pushViewController(RegistrationViewController(), animated: true)
+    }
+    @objc private func authWithGoogle(){
+        let controllers = [emailField, passwordField, signButton, signInGoogleButton]
+        controllers.forEach({ $0.isEnabled = false })
+        AuthenticationManager.shared.authWithGoogleWith(self) { credentials, userFields in
+            AuthenticationManager.shared.settingUpUserWith(credentials, userData: userFields) { isLogged, isFound, errorAlert in
+                if isLogged {
+                    if isFound {
+                        self.view.window?.rootViewController = MainTabBarController()
+                    } else {
+                        self.view.window?.rootViewController = CategorySourcesSelectorViewController(mode: .create)
+                    }
+                    self.view.window?.makeKeyAndVisible()
+                } else if let errorAlert = errorAlert {
+                    self.present(errorAlert, animated: true)
+                    controllers.forEach({ $0.isEnabled = true })
+                }
+            }
+        }
     }
     @objc private func loginEmail(){
         

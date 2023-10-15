@@ -60,6 +60,7 @@ class RegistrationViewController: UIViewController {
     }()
     private lazy var signInGoogleButton: OnboardingButton = {
         let signInGoogleButton = OnboardingButton(loginWith: .google)
+        signInGoogleButton.addTarget(self, action: #selector(authWithGoogle), for: .touchUpInside)
         return signInGoogleButton
     }()
 
@@ -151,6 +152,25 @@ class RegistrationViewController: UIViewController {
                 
         
         }
+    @objc private func authWithGoogle(){
+        let controllers = [nameField, emailField, passwordField, signButton, signInGoogleButton]
+        controllers.forEach({ $0.isEnabled = false })
+        AuthenticationManager.shared.authWithGoogleWith(self) { credentials, userFields in
+            AuthenticationManager.shared.settingUpUserWith(credentials, userData: userFields) { isLogged, isFound, errorAlert in
+                if isLogged {
+                    if isFound {
+                        self.view.window?.rootViewController = MainTabBarController()
+                    } else {
+                        self.view.window?.rootViewController = CategorySourcesSelectorViewController(mode: .create)
+                    }
+                    self.view.window?.makeKeyAndVisible()
+                } else if let errorAlert = errorAlert {
+                    self.present(errorAlert, animated: true)
+                    controllers.forEach({ $0.isEnabled = true })
+                }
+            }
+        }
+    }
 }
         
         

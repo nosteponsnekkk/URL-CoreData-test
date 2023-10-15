@@ -82,9 +82,12 @@ final class GreetingViewController: UIViewController {
         return .darkContent
     }
     @objc private func goToOnboarding() {
-        UIView.transition(with: self.view.window!, duration: 0.3, options: [.transitionCrossDissolve, .showHideTransitionViews], animations: {
-            self.view.window?.rootViewController = UINavigationController(rootViewController: OnboardingViewController())
-        }, completion: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [unowned self] in
+            UIView.transition(with: self.view.window!, duration: 0.3, options: [.transitionCrossDissolve, .showHideTransitionViews], animations: {
+                self.view.window?.rootViewController = UINavigationController(rootViewController: OnboardingViewController())
+            }, completion: nil)
+        }
+        
     }
   
 }
